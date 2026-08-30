@@ -12,7 +12,7 @@ function getTrimMultiplier(currentValue, targetValue, penaltyWeight = 0.4) {
 
 /**
  * Calculates a range multiplier so any boom angle inside the manual's specified 
- * windows (e.g., 35° to 65°) yields peak efficiency, penalized smoothly outside it.
+ * windows (e.g., 7° to 10°) yields peak efficiency, penalized smoothly outside it.
  */
 function getBoomRangeMultiplier(currentAngle, minAngle, maxAngle) {
   let deviation = 0;
@@ -21,7 +21,8 @@ function getBoomRangeMultiplier(currentAngle, minAngle, maxAngle) {
   } else if (currentAngle > maxAngle) {
     deviation = currentAngle - maxAngle;
   }
-  return Math.max(0.5, 1.05 - ((deviation / 110) * 0.75));
+  // Smoothly penalizes efficiency the further you drift from the optimal angle target
+  return Math.max(0.5, 1.05 - ((deviation / 90.0) * 0.75));
 }
 
 export function applyControls(pointOfSail, windSpeed, controls) {
@@ -51,10 +52,10 @@ export function applyControls(pointOfSail, windSpeed, controls) {
 
   // --- FIXED: ROUNDED DECIMAL & SAFE FALLBACK TARGETS ---
   const roundedWindSpeed = Math.round(windSpeed || 0);
-  const windTier = getWindTier(roundedWindSpeed) || "Moderate"; // ◄ Updated fallback to Moderate
+  const windTier = getWindTier(roundedWindSpeed) || "Moderate"; 
   
   const safeHeading = SCENARIO_TARGETS[lookupHeading] ? lookupHeading : "Close Hauled";
-  const targets = SCENARIO_TARGETS[safeHeading][windTier] || SCENARIO_TARGETS[safeHeading]["Moderate"]; // ◄ Updated fallback to Moderate
+  const targets = SCENARIO_TARGETS[safeHeading][windTier] || SCENARIO_TARGETS[safeHeading]["Moderate"]; 
 
   let modifier = 1.0;
 
@@ -64,13 +65,10 @@ export function applyControls(pointOfSail, windSpeed, controls) {
   const o = controls.outhaul;         
   const db = controls.daggerboard;    
 
-  // 🎯 FIX: Convert a string range like "0-8" into a clean numeric value (8)
-  let numericBoomAngle = 0;
-  if (typeof controls.boomAngle === 'string' && controls.boomAngle.includes('-')) {
-    const parts = controls.boomAngle.split('-');
-    numericBoomAngle = parseFloat(parts[parts.length - 1]) || 0; // Extracts the high end number (8)
-  } else {
-    numericBoomAngle = parseFloat(controls.boomAngle) || 0;
+  // 🎯 ANALOG UPDATE: Accept a clean float numeric value directly from your UI input slider/ticks
+  let numericBoomAngle = parseFloat(controls.boomAngle);
+  if (isNaN(numericBoomAngle)) {
+    numericBoomAngle = 0.0; // Fallback safe floor
   }
 
   // --- 1. BOOM ANGLE PENALTY ---
@@ -119,7 +117,6 @@ export function applyControls(pointOfSail, windSpeed, controls) {
   }
 
   // --- FINAL Physics PASS LINK ---
-  // Pass the wind speed and let the physics processor calculate tilt mechanics
   const isCapsized = calculateHeelAndCapsize(pointOfSail, windSpeed, controls);
   if (isCapsized) {
     return 0.0;
