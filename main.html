@@ -2,12 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Home | San Juan Academy</title>
-
-  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
   <title>Examiner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -21,57 +18,61 @@
   <script type="module" src="js/ilcaHandleControls.js"></script>
   <script type="module" src="js/ilcaMap.js"></script>
 
-  <!-- 3. Your Personal Custom CSS Last (Overrides everything above safely) -->
-  <link rel="stylesheet" href="css/style.css">
+    	<!-- 2. Your Personal Custom CSS Last (Overrides everything above safely) -->
+  	<link rel="stylesheet" href="css/style.css">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
-    <meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=no">
-</head>
 
+
+<meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=no">
+</head>
 <body>
-<div id="header-placeholder"></div>
-<main class="container">
-  <!-- This wrapper safely handles your full-screen layout design without bleeding into the navbar -->
-  <div id="map"                style="flex: 15;">
+  <div style="background-color: var(--nav-bg); color: var(--text-color); padding: 1rem; border-radius: 4px;">
+    <h2>San Juan Academy</h2>
   </div>
-  <div id="controlSelector"    style="flex: 1;">
-    <h4>Control Selector</h4>
-    <div class="controlSelector" style="display: flex; gap: 12px; align-items: center;">
-        <label>
-            <input type="radio" name="inputControl" value="1" checked>
-            Sheet
-        </label>
-        <label>
-            <input type="radio" name="inputControl" value="2">
-            Sailor Position
-        </label>
-        <label>
-            <input type="radio" name="inputControl" value="3">
-            Daggerboard
-        </label>
-        <label>
-            <input type="radio" name="inputControl" value="4">
-            Vang
-        </label>
-        <label>
-            <input type="radio" name="inputControl" value="5">
-            Downhaul
-        </label>
-        <label>
-            <input type="radio" name="inputControl" value="6">
-            Outhaul
-        </label>
+
+  <div class="container">
+
+    <div id="map"                style="flex: 15;">
     </div>
-  </div>
-  <div id="rudderControl"      style="flex: 1; display: flex; flex-direction: column;">
-    <div id="tackDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
-      <button class="control-button button-port" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-port'" style="flex: 1; height: 100%;">TURN PORT</button>
-      <button class="control-button button-starboard" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-starboard'" style="flex: 1; height: 100%;">TURN STARBOARD</button>
+    <div id="controlSelector"    style="flex: 1;">
+      <h4>&nbsp;Control Selector</h4>
+      <div class="controlSelector" style="display: flex; gap: 12px; align-items: center;">
+          <label>
+              <input type="radio" name="inputControl" value="1" checked>
+              Sheet
+          </label>
+          <label>
+              <input type="radio" name="inputControl" value="2">
+              Sailor Position
+          </label>
+          <label>
+              <input type="radio" name="inputControl" value="3">
+              Daggerboard
+          </label>
+          <label>
+              <input type="radio" name="inputControl" value="4">
+              Vang
+          </label>
+          <label>
+              <input type="radio" name="inputControl" value="5">
+              Downhaul
+          </label>
+          <label>
+              <input type="radio" name="inputControl" value="6">
+              Outhaul
+          </label>
+      </div>
     </div>
-  </div>
-  <div id="input-pane"         style="flex: 5;">
+    <div id="rudderControl"      style="flex: 1; display: flex; flex-direction: column;">
+      <div id="tackDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
+        <button class="control-button button-port" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-port'" style="flex: 1; height: 100%;">TURN PORT</button>
+        <button class="control-button button-starboard" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-starboard'" style="flex: 1; height: 100%;">TURN STARBOARD</button>
+      </div>
+    </div>
+    <div id="input-pane"         style="flex: 5;">
       <div id="mainsheetControl" class="input-section active">
         <h4>&nbsp;MainSheet</h4>
         <div class="control-row">
@@ -144,18 +145,14 @@
           <button class="control-button" data-control="outhaul" data-value="Full" onclick="updateOuthaulControl('Full')">FULL</button>
         </div>
       </div>
+    </div>
   </div>
-</main>
+ 
 <div class="control-row" style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%); z-index: 9999;">
-    <button id="startExamBtn">Start Exam</button>
+    <button id="startExamBtn">Start</button>
 </div>
-<div id="footer-placeholder">
-</div>
-  <!-- Bootstrap JavaScript -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Academy JavaScript -->
-  <script src="js/layout.js"></script>
+
 
   <script>
     // Map start simulation button logic
@@ -167,6 +164,7 @@
        });
     }
   </script>
+
   <script>
     const container = document.getElementById('controlSelector');
 
@@ -203,6 +201,7 @@
     });
 
   </script>
+
   <script>
 
     function updateBoomControl(boomAngle) {
@@ -246,6 +245,8 @@
         });
     }
   </script>
+
+
   <script>
       // Watch for button clicks to update the highlights instantly
       // This listens to any click inside the document
@@ -281,5 +282,6 @@
           });
       });
   </script>
+
 </body>
 </html>

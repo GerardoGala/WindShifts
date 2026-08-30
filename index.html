@@ -1,40 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Home | San Juan Academy</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wind Shifts | San Juan Academy</title>
 
-  
-  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- 2. Your Personal Custom CSS Last (Overrides everything above safely) -->
-  <link rel="stylesheet" href="css/style.css">
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    	<!-- 2. Your Personal Custom CSS Last (Overrides everything above safely) -->
+  	<link rel="stylesheet" href="css/style.css">
     <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
     <link rel="manifest" href="favicon/site.webmanifest">
+
+<!-- Academy CSS -->
+
 </head>
 <body>
-<div id="header-placeholder"></div>
-<main>
-  <section class="container text-center py-4">
-    <h3>Instructions:</h3> 
-    <!-- "text-start" forces text alignment to the left, and "d-inline-block" prevents the list from stretching -->
-    <ol class="text-start d-inline-block ps-4 mb-0">
-        <li>Round the Windward Mark by sailing upwind.</li>
-        <li>Round the Gybe Mark by sailing downdind.</li>
-        <li>Sail to the Leeward Mark to finish the exam.</li>
-    </ol>
-    <div class="text-center my-1">
-        <button id="closeBtn" class="btn btn-primary btn-lg">Close</button>
+    <div style="background-color: var(--nav-bg); color: var(--text-color); padding: 1rem; border-radius: 4px;">
+        <h2>San Juan Academy</h2>
     </div>
-  </section>
-</main>
-<div id="footer-placeholder">
+
+    <section class="container text-center py-4">
+    <h2>
+        Objectives:
+    </h2>
+
+    <p>
+        The objective of this simulation is to develop the student's ability
+        to recognize and respond to natural wind shifts while sailing upwind.
+        The student will learn to identify <strong>headers</strong> and
+        <strong>lifts</strong> by observing the wind indicator, the boat's
+        heading, and the behavior of the sail.
+    </p>
+
+    <h3>
+        Instructions:
+    </h3>
+
+    <!-- "text-start" forces text alignment to the left,
+         and "d-inline-block" prevents the list from stretching -->
+    <ol class="text-start d-inline-block ps-4 mb-0">
+        <li>
+            Sail from the starting position toward the
+            <strong>Windward Mark</strong>.
+        </li>
+        <li>
+            The simulation will provide a steady
+            <strong>15-knot wind</strong> with natural variations in
+            wind direction and one or two gusts.
+        </li>
+        <li>
+            Watch the <strong>Wind Indicator</strong> and observe how changes
+            in wind direction affect your boat.
+        </li>
+        <li>
+            Use the sail and the boat's response to recognize
+            <strong>headers</strong> and <strong>lifts</strong>.
+        </li>
+        <li>
+            Use <strong>Sheet In</strong>, <strong>Sheet Out</strong>, and
+            <strong>Tack</strong> when appropriate.
+        </li>
+        <li>
+            Your goal is to sail efficiently toward the
+            <strong>Windward Mark</strong>, making good decisions as the
+            wind shifts.
+        </li>
+    </ol>
+</section>
+
+
+  
+
+<div class="text-center my-1">
+    <a href="main.html" class="btn btn-primary btn-lg">Next</a>
 </div>
-     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
-     <script src="js/layout.js"></script>
 </body>
-</html>
