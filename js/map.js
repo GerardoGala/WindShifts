@@ -3,12 +3,11 @@
 let windControlDiv;       // Wind panel
 let ilcaControlDiv;       // ILCA Status panel
 let clinometerControlDiv; // Heel Clinometer panel
-
+let windVaneControlDiv;   // Wind Vane panel
 
 // ============================================================================
 // Helper function to format raw seconds into MM:SS format
 // ============================================================================
-
 function formatTime(totalSeconds) {
   if (isNaN(totalSeconds) || totalSeconds < 0) return "0:00";
 
@@ -18,31 +17,25 @@ function formatTime(totalSeconds) {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-
 // ============================================================================
 // Initialize Map
 // ============================================================================
-
 export function initMap() {
-
   const leewardMarkLat = window.globalSimulationData.leewardMarkLat;
   const leewardMarkLon = window.globalSimulationData.leewardMarkLon;
 
   const windwardMarkLat = window.globalSimulationData.windwardMarkLat;
   const windwardMarkLon = window.globalSimulationData.windwardMarkLon;
 
-
   // ==========================================================================
   // Buoy Icon
   // ==========================================================================
-
   const buoySVG = `
     <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
       <circle cx="24" cy="24" r="20" fill="yellow" stroke="orange" stroke-width="4"/>
       <circle cx="24" cy="24" r="8" fill="orange" opacity="0.6"/>
     </svg>
   `;
-
 
   const buoyIcon = L.icon({
     iconUrl: "data:image/svg+xml;base64," + btoa(buoySVG),
@@ -51,16 +44,12 @@ export function initMap() {
     popupAnchor: [0, -10]
   });
 
-
 // =========================================================================
 // 🟢 STREAMLINED STATIC GREEN TARGET GLOW (No Flashing)
 // =========================================================================
 
 // A clean, solid green circle with a soft outer frame (40px wide)
 const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#00FF00" opacity="0.4" stroke="#00CC00" stroke-width="2"/></svg>';
-
-
-
   const greenTargetIcon = L.icon({
     iconUrl: "data:image/svg+xml;base64," + btoa(greenTargetSVG),
     iconSize: [48, 48],
@@ -68,47 +57,37 @@ const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" heigh
     popupAnchor: [0, -24]
   });
 
-
   // ==========================================================================
   // Create Leaflet Map
   // ==========================================================================
-
   const map = L.map('map', {
     center: [windwardMarkLat, windwardMarkLon],
     zoom: 16,
-
     dragging: false,
     zoomControl: false,
     scrollWheelZoom: false,
     doubleClickZoom: false,
     touchZoom: false
-
   });
 
   // --- Add the 3 Marks to the Map ---
   const windwardMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: buoyIcon })
     .addTo(map);
-
   const leewardMarker = L.marker([leewardMarkLat, leewardMarkLon], { icon: buoyIcon })
     .addTo(map);
-
   // --- Add the green target marker on top of the windward Mark ---
-window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: greenTargetIcon })
-  .addTo(map);
+  window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: greenTargetIcon })
+    .addTo(map);
 
   // ==========================================================================
   // ILCA STATUS CONTROL
   // Position: TOP-LEFT
   // ==========================================================================
-
   const ILCAControl = L.Control.extend({
-
     options: {
       position: 'topleft'
     },
-
     onAdd: function(map) {
-
       ilcaControlDiv = L.DomUtil.create(
         'div',
         'ilca-status-container'
@@ -139,20 +118,15 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
   // WIND CONTROL
   // Position: TOP-RIGHT
   // ==========================================================================
-
   const WindControl = L.Control.extend({
-
     options: {
       position: 'topright'
     },
-
     onAdd: function(map) {
-
       windControlDiv = L.DomUtil.create(
         'div',
         'wind-indicator-container'
       );
-
       windControlDiv.style.background = 'white';
       windControlDiv.style.padding = '8px';
       windControlDiv.style.borderRadius = '5px';
@@ -163,11 +137,8 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
       windControlDiv.style.fontSize = '12px';
       windControlDiv.style.fontWeight = 'bold';
       windControlDiv.style.color = '#222';
-
       L.DomEvent.disableClickPropagation(windControlDiv);
-
       updateWindControl();
-
       return windControlDiv;
     }
   });
@@ -177,13 +148,10 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
   // CLINOMETER CONTROL
   // Position: BOTTOM-RIGHT
   // ==========================================================================
-
   const ClinometerControl = L.Control.extend({
-
     options: {
       position: 'bottomright'
     },
-
     onAdd: function(map) {
 
       clinometerControlDiv = L.DomUtil.create(
@@ -210,24 +178,57 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
     }
   });
 
+// ==========================================================================
+// WIND VANE CONTROL (ILCA Style with No-Go Zone)
+// Position: BOTTOM-LEFT (Alongside Clinometer)
+// ==========================================================================
+// Global variable holder for update loops
+const WindVaneControl = L.Control.extend({
+  options: {
+    position: 'bottomleft'
+  },
+  onAdd: function(map) {
+    // Create the container using Leaflet DOM utility
+    windVaneControlDiv = L.DomUtil.create(
+      'div',
+      'wind-vane-control-container'
+    );
+    // Apply exact visual formatting styles from your clinometer design baseline
+    windVaneControlDiv.style.background = 'white';
+    windVaneControlDiv.style.padding = '8px';
+    windVaneControlDiv.style.borderRadius = '5px';
+    windVaneControlDiv.style.boxShadow = '0 1px 5px rgba(0,0,0,0.4)';
+    windVaneControlDiv.style.textAlign = 'center';
+    windVaneControlDiv.style.fontFamily = 'sans-serif';
+    windVaneControlDiv.style.fontSize = '12px';
+    windVaneControlDiv.style.color = '#222';
+    windVaneControlDiv.style.fontWeight = 'bold';
 
-  // ==========================================================================
-  // Add the three independent controls
-  // ==========================================================================
+    // Prevent map dragging/clicks from passing through the instrument panel
+    L.DomEvent.disableClickPropagation(windVaneControlDiv);
 
+    // Run initial rendering pass
+    updateWindVaneControl();
+
+    return windVaneControlDiv;
+  }
+});
+
+/**
+ * Updates the inner SVG vector drawing based on current simulation vectors.
+ * Call this inside your main rendering/tick animation loop.
+ */
+  // Add the four independent controls
   map.addControl(new ILCAControl());
-
   map.addControl(new WindControl());
-
   map.addControl(new ClinometerControl());
+  map.addControl(new WindVaneControl());
 
 
   // ==========================================================================
   // Define race bounds
   // ==========================================================================
-
   const bounds = L.latLngBounds([
-
     [
       windwardMarkLat,
       windwardMarkLon
@@ -240,93 +241,16 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
 
   ]);
 
-
   map.fitBounds(bounds, {
     padding: [50, 50]
   });
-
-
   return map;
 }
-
-
-// ============================================================================
-// Refresh WIND control
-// Position: TOP-RIGHT
-// ============================================================================
-
-export function updateWindControl() {
-
-  if (!windControlDiv) return;
-
-
-  const windDir =
-    window.globalSimulationData.windDirection || 0;
-
-  const windSpeed =
-    Number(window.globalSimulationData.windSpeed)
-      ?.toFixed(1) || "0.0";
-
-
-  windControlDiv.innerHTML = `
-
-    <div style="margin-bottom: 2px;">
-      WIND
-    </div>
-
-
-    <svg xmlns="http://www.w3.org/2000/svg"
-         width="50"
-         height="50"
-         viewBox="0 0 50 50">
-
-      <circle cx="25"
-              cy="25"
-              r="22"
-              fill="none"
-              stroke="#ccc"
-              stroke-width="2"/>
-
-      <text x="25"
-            y="10"
-            font-size="8"
-            text-anchor="middle"
-            fill="#666">
-        N
-      </text>
-
-
-      <g transform="rotate(${windDir}, 25, 25)">
-
-        <line x1="25"
-              y1="5"
-              x2="25"
-              y2="40"
-              stroke="blue"
-              stroke-width="3"
-              stroke-linecap="round"/>
-
-        <polygon points="25,45 20,35 30,35"
-                 fill="blue"/>
-
-      </g>
-
-    </svg>
-
-
-    <div style="margin-top: 2px; color: blue;">
-      ${windDir}° at ${windSpeed} kn
-    </div>
-
-  `;
-}
-
 
 // ============================================================================
 // Refresh ILCA STATUS control
 // Position: TOP-LEFT
 // ============================================================================
-
 export function updateILCAControl() {
 
   if (!ilcaControlDiv) return;
@@ -428,6 +352,248 @@ export function updateILCAControl() {
 
   // Keep the clinometer synchronized with the same ILCA data.
   updateClinometerControl();
+
+  // 🛠️ ADD THIS LINE: Keep the wind vane synchronized with wind and heading data!
+  updateWindVaneControl();
+}
+
+// ============================================================================
+// Refresh WIND control
+// Position: TOP-RIGHT
+// ============================================================================
+export function updateWindControl() {
+
+  if (!windControlDiv) return;
+
+
+  const windDir =
+    window.globalSimulationData.windDirection || 0;
+
+  const windSpeed =
+    Number(window.globalSimulationData.windSpeed)
+      ?.toFixed(1) || "0.0";
+
+
+  windControlDiv.innerHTML = `
+
+    <div style="margin-bottom: 2px;">
+      WIND
+    </div>
+
+
+    <svg xmlns="http://www.w3.org/2000/svg"
+         width="50"
+         height="50"
+         viewBox="0 0 50 50">
+
+      <circle cx="25"
+              cy="25"
+              r="22"
+              fill="none"
+              stroke="#ccc"
+              stroke-width="2"/>
+
+      <text x="25"
+            y="10"
+            font-size="8"
+            text-anchor="middle"
+            fill="#666">
+        N
+      </text>
+
+
+      <g transform="rotate(${windDir}, 25, 25)">
+
+        <line x1="25"
+              y1="5"
+              x2="25"
+              y2="40"
+              stroke="blue"
+              stroke-width="3"
+              stroke-linecap="round"/>
+
+        <polygon points="25,45 20,35 30,35"
+                 fill="blue"/>
+
+      </g>
+
+    </svg>
+
+
+    <div style="margin-top: 2px; color: blue;">
+      ${windDir}° at ${windSpeed} kn
+    </div>
+
+  `;
+}
+
+// ============================================================================
+// Refresh WIND VANE
+// Position: BOTTOM-LEFT
+// ============================================================================
+export function updateWindVaneControl() {
+  if (!windVaneControlDiv) return;
+
+  const globalData =
+    window.globalSimulationData || {};
+
+  const ilca =
+    globalData.ILCA || {};
+
+  const trueWindDir =
+    parseFloat(globalData.windDirection) || 0;
+
+  const boatHeading =
+    parseFloat(ilca.heading) || 0;
+
+  // ==========================================================================
+  // Calculate Relative Apparent Wind Angle (0° = Wind dead on the bow)
+  // ==========================================================================
+  let relativeWindAngle = trueWindDir - boatHeading;
+  relativeWindAngle = (relativeWindAngle + 360) % 360;
+
+  // ==========================================================================
+  // No-Go Zone Logic (Red warning text if within 45° of the bow)
+  // ==========================================================================
+  const isInIrons = relativeWindAngle <= 45 || relativeWindAngle >= 315;
+  let textColor = "#475569";
+  let statusText = "CLEAR";
+  
+  if (isInIrons) {
+    textColor = "#ef4444";
+    statusText = "IN IRONS";
+  }
+
+  // ==========================================================================
+  // Wind Vane HTML
+  // ==========================================================================
+  windVaneControlDiv.innerHTML = `
+    <div style="
+      font-size: 11px;
+      letter-spacing: 0.5px;
+      color: #475569;
+      font-weight: bold;
+      margin-bottom: 3px;
+      font-family: sans-serif;
+    ">
+      ILCA WIND VANE
+    </div>
+
+    <div style="
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border: 1px solid #cbd5e1;
+      border-radius: 50%;
+      background: #f8fafc;
+      margin: 0 auto;
+      overflow: hidden;
+    ">
+
+      <!-- 🛑 Red No-Go Zone Indicator (90° wedge total at top) -->
+      <div style="
+        position: absolute;
+        top: 0;
+        left: 50%;
+        width: 100px;
+        height: 50px;
+        background: rgba(239, 68, 68, 0.12);
+        border-bottom: 1px dashed #ef4444;
+        transform-origin: bottom center;
+        transform: translateX(-50%) rotate(0deg);
+        clip-path: polygon(50% 100%, 0 0, 100% 0);
+        pointer-events: none;
+      ">
+      </div>
+
+      <!-- Static Bow Landmark Label -->
+      <div style="
+        position: absolute;
+        left: 50%;
+        top: 4px;
+        transform: translateX(-50%);
+        font-size: 8px;
+        color: #475569;
+        font-weight: bold;
+      ">
+        BOW
+      </div>
+
+      <!-- Static No-Zone Limit Labels -->
+      <div style="
+        position: absolute;
+        left: 12px;
+        top: 42px;
+        font-size: 7px;
+        color: #ef4444;
+      ">
+        45°
+      </div>
+      <div style="
+        position: absolute;
+        right: 12px;
+        top: 42px;
+        font-size: 7px;
+        color: #ef4444;
+      ">
+        45°
+      </div>
+
+      <!-- Rotating Indicator Arrow Needle -->
+      <!-- 🛠️ FIX: Added absolute line-height resets and layout bounds to ensure elements don't scale down -->
+      <div style="
+        position: absolute;
+        left: 50%;
+        top: 10px;
+        width: 2px;
+        height: 80px;
+        background: #ff4500;
+        line-height: 1;
+        font-size: 0px;
+        transform-origin: center center;
+        transform:
+          translateX(-50%)
+          rotate(${relativeWindAngle}deg);
+        transition: transform 0.1s linear;
+      ">
+        <!-- Arrow Head (Pointing to where wind comes from) -->
+        <!-- 🛠️ FIX: Boosted border parameters for visibility and locked bounding box spacing -->
+        <div style="
+          position: absolute;
+          top: -8px;
+          left: -6px;
+          width: 0;
+          height: 0;
+          border-left: 7px solid transparent;
+          border-right: 7px solid transparent;
+          border-bottom: 12px solid #ff4500;
+        ">
+        </div>
+        <!-- Balance Tail Line -->
+        <!-- 🛠️ FIX: Extended baseline width to cleanly contrast the pointer head -->
+        <div style="
+          position: absolute;
+          bottom: 0;
+          left: -11px;
+          width: 24px;
+          height: 4px;
+          background: #ff4500;
+        ">
+        </div>
+      </div>
+    </div>
+
+    <div style="
+      margin-top: 3px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000000;
+    ">
+      <span style="color: ${textColor};">
+        ${statusText} (${Math.round(relativeWindAngle)}°)
+      </span>
+    </div>
+  `;
 }
 
 
@@ -435,48 +601,32 @@ export function updateILCAControl() {
 // Refresh HEEL CLINOMETER
 // Position: BOTTOM-RIGHT
 // ============================================================================
-
 export function updateClinometerControl() {
-
   if (!clinometerControlDiv) return;
-
 
   const ilca =
     window.globalSimulationData.ILCA || {};
 
-
   const uiRotation =
     ilca.clinometer || 0;
-
 
   const absoluteHeel =
     Math.abs(uiRotation);
 
-
   // ==========================================================================
   // Heel color thresholds
   // ==========================================================================
-
   let needleColor = "#38bdf8";
-
-
   if (absoluteHeel >= 38) {
-
     needleColor = "#ef4444";
-
   } else if (absoluteHeel >= 25) {
-
     needleColor = "#f59e0b";
-
   }
-
 
   // ==========================================================================
   // Clinometer HTML
   // ==========================================================================
-
   clinometerControlDiv.innerHTML = `
-
     <div style="
       font-size: 11px;
       letter-spacing: 0.5px;
@@ -488,7 +638,6 @@ export function updateClinometerControl() {
       HEEL CLINOMETER
     </div>
 
-
     <div style="
       position: relative;
       width: 100px;
@@ -499,7 +648,6 @@ export function updateClinometerControl() {
       margin: 0 auto;
       overflow: hidden;
     ">
-
 
       <div style="
         position: absolute;
@@ -514,9 +662,7 @@ export function updateClinometerControl() {
         45° [ 0° ] 45°
       </div>
 
-
       <!-- Needle -->
-
       <div style="
         position: absolute;
         left: 50%;
@@ -530,8 +676,6 @@ export function updateClinometerControl() {
           rotate(${uiRotation}deg);
         transition: transform 0.2s ease-out;
       ">
-
-
         <div style="
           position: absolute;
           top: 0;
@@ -542,12 +686,8 @@ export function updateClinometerControl() {
           border-radius: 50%;
         ">
         </div>
-
-
       </div>
-
     </div>
-
 
     <div style="
       margin-top: 3px;
@@ -555,14 +695,14 @@ export function updateClinometerControl() {
       font-weight: bold;
       color: #000000;
     ">
-
       Angle:
-
       <span style="color: ${needleColor};">
         ${Math.round(absoluteHeel)}°
       </span>
-
     </div>
-
   `;
 }
+
+
+
+

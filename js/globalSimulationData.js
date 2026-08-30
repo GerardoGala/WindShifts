@@ -44,8 +44,8 @@ window.globalSimulationData = {
     pointOfSail: "",
     heading: 45,
     speed: 15,
-    sailorPosition: "Mid Center", //beating upwind at 15 knots of wind
-    boomAngle: 7,                 //beating upwind at 15 knots of wind
+    sailorPosition: "Hiking Hard", //beating upwind at 15 knots of wind
+    boomAngle: 15,                 //beating upwind at 15 knots of wind
     daggerboard: "Down",          //beating upwind at 15 knots of wind
     vang: "Max",                  //beating upwind at 15 knots of wind
     downhaul: "Max Luff",         //beating upwind at 15 knots of wind
