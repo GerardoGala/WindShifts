@@ -1,0 +1,285 @@
+/* 1. Define your 5 colors */
+:root {
+  --bg-color: rgb(245 240 223);       /* 1. Soft Sand (Main Light Background) */
+  --text-color: rgb(33 37 41);         /* 2. Charcoal Black (Main Text for clear reading) */
+  --primary-color: rgb(21 101 161);    /* 3. Deep Sea Blue (Buttons) */
+  --nav-bg: rgb(113 186 236);          /* 4. Light Clear Sky Blue (Navbar Background) */
+  --footer-bg: rgb(229 217 186);       /* 5. Sandy Beach Beige (Footer Background) */
+}
+/* 2. Assign them to your HTML structures */
+body {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+nav.navbar {
+  background-color: var(--nav-bg) !important;
+      height: 9dvh;
+}
+nav.navbar .navbar-brand,
+nav.navbar .nav-link {
+  color: var(--text-color) !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  color: var(--bg-color) !important; 
+}
+
+/* Apply your beach-beige color to the footer element */
+footer {
+  background-color: var(--footer-bg) !important;
+  color: var(--text-color) !important;
+}
+
+/* Ensure any links inside the footer are also easy to read */
+footer a {
+  color: var(--text-color) !important;
+  text-decoration: underline;
+}
+
+/* Fix: Change button text to pure white so it stands out against the blue background */
+/* Overrides Bootstrap's default outline primary button */
+.btn-outline-primary {
+  background-color: transparent !important;
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Overrides the look when hovered */
+.btn-outline-primary:hover {
+  background-color: var(--primary-color) !important;
+  color: rgb(255 255 255) !important;
+  border-color: var(--primary-color) !important;
+}
+
+
+/* ==========================================
+   2. Layout Container 
+   ========================================== */
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Tighter gap between the 4 major divs */
+  height: 100dvh;
+}
+
+  /* 1. Make the input pane a flex container that fills the height */
+#input-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Or 100vh depending on your container setup */
+}
+
+
+/* 2. Hide inactive sections, but make the active section fill ALL available space */
+.input-section {
+  display: none; 
+}
+
+.input-section.active {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* 💡 This forces the active section to stretch and fill the whole #input-pane */
+  height: 100%;
+}
+
+/* 3. Make the rows stretch evenly from top to bottom */
+.input-section.active .control-row,
+.input-section.active .control-column {
+  display: flex;
+  flex: 1; /* 💡 This splits the vertical space evenly among rows/columns */
+  gap: 8px; /* Adds space between buttons */
+  margin-bottom: 8px;
+}
+
+/* 4. Make the buttons expand to fill the width and height of their row */
+.control-button {
+  flex: 1; /* 💡 This forces buttons to stretch horizontally to fill the row */
+  width: 100%;
+  height: 100%; /* Forces buttons to stretch vertically */
+  font-size: 1.1rem; /* Optional: makes text easier to read on big buttons */
+}
+
+
+/* ==========================================
+   3. Individual Panel Blocks
+   ========================================== */
+#windControl, 
+#pointOfSailControl, 
+#map, 
+#input-pane {
+  background: #ffffff;
+  padding: 8px; /* Reduced box interior padding */
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
+/* Map specific styling */
+#map {
+  background-color: #e5e9f0;
+  border: 1px dashed #ccd4e0;
+  height: 600px;
+}
+
+/* ==========================================
+   4. Form Elements & Radio Buttons
+   ========================================== */
+label {
+  display: block;
+  margin-bottom: 4px; /* Snug spacing between options */
+  cursor: pointer;
+  font-size: 0.88rem;
+}
+
+input[type="radio"] {
+  margin-right: 4px;
+  vertical-align: middle;
+}
+
+/* ==========================================
+   5. Input Pane / Active Section
+   ========================================== */
+#input-pane {
+  display: flex;
+  flex-direction: column;
+  padding: 4px; /* Minimal padding around controls */
+}
+
+/* Hide inactive sections */
+.input-section:not(.active) {
+  display: none !important;
+}
+
+/* Active section matches its exact text/button height */
+.input-section.active {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px; /* Close spacing between button rows */
+  box-sizing: border-box;
+}
+
+/* Row-based buttons alignment */
+.control-row {
+  display: flex;
+  gap: 4px; /* Minimal gap side-by-side */
+}
+
+/* Column-based buttons alignment */
+.control-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Minimal gap stacked */
+}
+
+/* Modern, dense dashboard buttons */
+.control-button {
+  flex: 1;
+  padding: 5px 8px; /* Smaller, tight padding inside buttons */
+  font-size: 0.85rem; /* Readable but small font */
+  font-weight: 500;
+  color: #4a5568;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.control-button:hover {
+  background-color: #edf2f7;
+}
+/* ==========================================
+   INPUT PANE & ACTIVE SECTIONS
+   ========================================== */
+#input-pane {
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+/* Hide inactive sections */
+.input-section:not(.active) {
+  display: none !important;
+}
+
+/* Active control layout */
+.input-section.active {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.control-row {
+  display: flex;
+  gap: 4px;
+}
+
+.control-column {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Base button style (Unclicked) */
+.control-button {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #4a5568;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  white-space: nowrap;
+}
+
+/* Hover state (Only changes background slightly on mouseover) */
+.control-button:hover {
+  background-color: #edf2f7;
+}
+
+/* =========================================================
+   🎯 THE FIX: THE HIGHLIGHT RULE FOR THE CURRENT SETTING
+   ========================================================= */
+/* Change '.selected' to match whatever class name your JS uses */
+.control-button.selected,
+.control-button.active-setting { 
+  background-color: #3182ce !important; /* Vivid Sea Blue */
+  color: #ffffff !important;            /* High-contrast White Text */
+  border-color: #2b6cb0 !important;      /* Darker Blue Border */
+  font-weight: bold !important;
+}
+
+#pointOfSailControl .point-of-sail-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 12px;
+    align-items: center;
+}
+
+#pointOfSailControl label {
+    white-space: nowrap;
+}
+
+  #startExamBtn {
+    position: absolute;
+    bottom: 30px;       /* lower center */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: #007acc;
+    color: #fff;
+    border: none;
+    padding: 16px 32px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+  }

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home | San Juan Academy</title>
+
+  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Examiner</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+
+  <!-- STEP 1: Load Core Map Engines & Global Variables First -->
+  <script src="js/globalSimulationData.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+ 
+  <!-- STEP 2: Load Your Core Simulator Engine Layouts -->
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/ilcaHandleControls.js"></script>
+  <script type="module" src="js/ilcaMap.js"></script>
+
+  <!-- 3. Your Personal Custom CSS Last (Overrides everything above safely) -->
+  <link rel="stylesheet" href="css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
+    <meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=no">
+</head>
+
+<body>
+<div id="header-placeholder"></div>
+<main class="container">
+  <!-- This wrapper safely handles your full-screen layout design without bleeding into the navbar -->
+  <div id="map"                style="flex: 15;">
+  </div>
+  <div id="controlSelector"    style="flex: 1;">
+    <h4>Control Selector</h4>
+    <div class="controlSelector" style="display: flex; gap: 12px; align-items: center;">
+        <label>
+            <input type="radio" name="inputControl" value="1" checked>
+            Sheet
+        </label>
+        <label>
+            <input type="radio" name="inputControl" value="2">
+            Sailor Position
+        </label>
+        <label>
+            <input type="radio" name="inputControl" value="3">
+            Daggerboard
+        </label>
+        <label>
+            <input type="radio" name="inputControl" value="4">
+            Vang
+        </label>
+        <label>
+            <input type="radio" name="inputControl" value="5">
+            Downhaul
+        </label>
+        <label>
+            <input type="radio" name="inputControl" value="6">
+            Outhaul
+        </label>
+    </div>
+  </div>
+  <div id="rudderControl"      style="flex: 1; display: flex; flex-direction: column;">
+    <div id="tackDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
+      <button class="control-button button-port" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-port'" style="flex: 1; height: 100%;">TURN PORT</button>
+      <button class="control-button button-starboard" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-starboard'" style="flex: 1; height: 100%;">TURN STARBOARD</button>
+    </div>
+  </div>
+  <div id="input-pane"         style="flex: 5;">
+      <div id="mainsheetControl" class="input-section active">
+        <h4>&nbsp;MainSheet</h4>
+        <div class="control-row">
+          <!-- Upwind Ranges -->
+          <button class="control-button" data-control="boom" data-value="0-8" onclick="updateBoomControl('0-8')">0° - 8°</button>
+          <button class="control-button" data-control="boom" data-value="5-15" onclick="updateBoomControl('5-15')">5° - 15°</button>
+        </div>
+        <div class="control-row">
+          <!-- Reaching Ranges -->
+          <button class="control-button" data-control="boom" data-value="35-65" onclick="updateBoomControl('35-65')">35° - 65°</button>
+          <button class="control-button" data-control="boom" data-value="40-70" onclick="updateBoomControl('40-70')">40° - 70°</button>
+      </div>
+          <div class="control-row">  
+          <!-- Downwind Ranges -->
+          <button class="control-button" data-control="boom" data-value="75-85" onclick="updateBoomControl('75-85')">75° - 85°</button>
+          <button class="control-button" data-control="boom" data-value="90" onclick="updateBoomControl('90')">90°</button>
+        </div>
+      </div>
+
+      <div id="daggerboardControl" class="input-section">
+        <div class="control-column">
+          <h4>&nbsp;Daggerboard Control</h4>
+          <button class="control-button" data-control="daggerboard" data-value="Up" onclick="updateDaggerboardControl('CENTERBOARD UP')">Up</button>
+          <button class="control-button" data-control="daggerboard" data-value="Center" onclick="updateDaggerboardControl('Center')">Center</button>
+          <button class="control-button" data-control="daggerboard" data-value="Down" onclick="updateDaggerboardControl('Down')">Down</button>
+        </div>
+      </div>
+
+      <div id="sailorPositionControl" class="input-section">
+        <h4>&nbsp;Sailor Position</h4>
+        <div class="control-row">
+          <button class="control-button" data-control="sailorPosition" data-value="Forward" onclick="updateSailorPosition('Forward')">Forward</button>
+        </div>
+        <div class="control-row">
+          <!-- STANDARDIZED: Set exclusively to Hike Hard -->
+          <button class="control-button" data-control="sailorPosition" data-value="Hike Hard" onclick="updateSailorPosition('Hike Hard')">Hike Hard</button>
+          <button class="control-button" data-control="sailorPosition" data-value="Mid Center" onclick="updateSailorPosition('Mid Center')">Mid Center</button>
+          <button class="control-button" data-control="sailorPosition" data-value="Leeward" onclick="updateSailorPosition('Leeward')">Leeward</button>
+        </div>
+        <div class="control-row">
+          <button class="control-button" data-control="sailorPosition" data-value="Aft" onclick="updateSailorPosition('Aft')">Aft</button>
+        </div>
+      </div>
+
+      <div id="vangControl" class="input-section">
+        <div class="control-column">
+          <h4>&nbsp;Vang</h4>
+          <button class="control-button" data-control="vang" data-value="Max" onclick="updateVangControl('Max')">MAX</button>
+          <button class="control-button" data-control="vang" data-value="Center" onclick="updateVangControl('Center')">CENTER</button>
+          <button class="control-button" data-control="vang" data-value="Ease" onclick="updateVangControl('Ease')">EASE</button>
+        </div>
+      </div>
+
+      <div id="downhaulControl" class="input-section">
+        <div class="control-column">
+          <h4>&nbsp;Downhaul</h4>
+          <!-- 🎯 FIXED FOR PERFECT CONSISTENCY WITH SCENARIO_TARGETS -->
+          <button class="control-button" data-control="downhaul" data-value="Max Luff" onclick="updateDownhaulControl('Max Luff')">MAX LUFF</button>
+          <button class="control-button" data-control="downhaul" data-value="Base" onclick="updateDownhaulControl('Base')">BASE</button>
+          <button class="control-button" data-control="downhaul" data-value="Off" onclick="updateDownhaulControl('Off')">OFF</button>
+        </div>
+      </div>
+
+      <div id="outhaulControl" class="input-section">
+        <div class="control-column">
+          <h4>&nbsp;Outhaul</h4>
+          <!-- 🎯 FIXED: Passed text strings to update functions and data-values -->
+          <button class="control-button" data-control="outhaul" data-value="Flat" onclick="updateOuthaulControl('Flat')">FLAT</button>
+          <button class="control-button" data-control="outhaul" data-value="Base" onclick="updateOuthaulControl('Base')">BASE</button>
+          <button class="control-button" data-control="outhaul" data-value="Full" onclick="updateOuthaulControl('Full')">FULL</button>
+        </div>
+      </div>
+  </div>
+</main>
+<div class="control-row" style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%); z-index: 9999;">
+    <button id="startExamBtn">Start Exam</button>
+</div>
+<div id="footer-placeholder">
+</div>
+  <!-- Bootstrap JavaScript -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Academy JavaScript -->
+  <script src="js/layout.js"></script>
+
+  <script>
+    // Map start simulation button logic
+    const startExamBtn = document.getElementById('startExamBtn');
+      if (startExamBtn) {
+        startExamBtn.addEventListener('click', () => {
+          launchSimulation();
+          startExamBtn.style.display = 'none';
+       });
+    }
+  </script>
+  <script>
+    const container = document.getElementById('controlSelector');
+
+    container.addEventListener('change', (event) => {
+        const selectedValue = event.target.value;
+        console.log(`clicked on value: ${selectedValue}`);
+
+        // 1. First, hide all control sections by removing the active class
+        const sections = document.querySelectorAll('.input-section');
+        sections.forEach(section => section.classList.remove('active'));
+
+        // 2. Show only the section that matches the checked radio button
+        // (Note: HTML values are numbers "1", "2", "3", etc.)
+        switch (selectedValue) {
+            case "1":
+                document.getElementById("mainsheetControl").classList.add("active");
+                break; // 💡 Added break to prevent falling through
+            case "2":
+                document.getElementById("sailorPositionControl").classList.add("active");
+                break;
+            case "3":
+                document.getElementById("daggerboardControl").classList.add("active");
+                break;
+            case "4":
+                document.getElementById("vangControl").classList.add("active");
+                break;
+            case "5":
+                document.getElementById("downhaulControl").classList.add("active");
+                break;
+            case "6":
+                document.getElementById("outhaulControl").classList.add("active");
+                break;
+        }
+    });
+
+  </script>
+  <script>
+
+    function updateBoomControl(boomAngle) {
+      window.globalSimulationData.ILCA.boomAngle = String(boomAngle);
+      //console.log(`boom angle: ${window.globalSimulationData.ILCA.boomAngle}`);
+    }
+
+    function updateSailorPosition(position) {
+      window.globalSimulationData.ILCA.sailorPosition = position;
+      //console.log(`sailor position: ${window.globalSimulationData.ILCA.sailorPosition}`);
+
+    }
+
+    function updateDaggerboardControl(daggerboard) {
+        window.globalSimulationData.ILCA.daggerboard = daggerboard;
+    }
+
+    function updateVangControl(vang) {
+        window.globalSimulationData.ILCA.vang = vang;
+    }
+
+    function updateDownhaulControl(downhaul) {
+        window.globalSimulationData.ILCA.downhaul = downhaul;
+
+    }
+
+    function updateOuthaulControl(outhaul) {
+        window.globalSimulationData.ILCA.outhaul = outhaul;
+    }
+
+
+  </script>
+
+  <script>
+    // Map start simulation button logic
+    const mapStartSimulationBtn = document.getElementById('mapStartSimulationBtn');
+    if (mapStartSimulationBtn) {
+        mapStartSimulationBtn.addEventListener('click', () => {
+          launchSimulation();
+          mapStartSimulationBtn.style.display = 'none';
+        });
+    }
+  </script>
+  <script>
+      // Watch for button clicks to update the highlights instantly
+      // This listens to any click inside the document
+      document.addEventListener("click", function(event) {
+          // Check if the clicked item is a control button
+          if (event.target.classList.contains("control-button")) {
+              
+              // Find the parent section (like #boomControl or #vangControl)
+              const parentSection = event.target.closest(".input-section");
+              
+              if (parentSection) {
+                  // Find any previously selected button in THIS section and clear it
+                  const previousActive = parentSection.querySelector(".control-button.selected");
+                  if (previousActive) {
+                      previousActive.classList.remove("selected");
+                  }
+                  
+                  // Add the highlight class to the newly clicked button
+                  event.target.classList.add("selected");
+              }
+          }
+      });
+
+  </script>
+
+
+  <script>
+      document.querySelectorAll('input[name="wind"]').forEach(radio => {
+          radio.addEventListener("change", () => {
+              const windSpeed = Number(radio.value);
+              window.globalSimulationData.windSpeed = windSpeed;
+              console.log("Wind changed to:", windSpeed, "knots");
+          });
+      });
+  </script>
+</body>
+</html>
