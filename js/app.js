@@ -1,8 +1,9 @@
 // app.js
 import { initMap, updateWindControl, updateILCAControl } from './map.js';
-import { fetchWind } from './wind.js';
+import { fetchWind, startWindShiftEngine } from './wind.js'; 
 import { updateILCA } from './ilcaUpdateILCA.js';
-import { applyControls } from './ilcaApplyControls.js'; 
+import { applyControls } from './ilcaApplyControls.js';
+
 
 let map;
 let launched = false;
@@ -129,6 +130,7 @@ async function updateWindFromAPI() {
 
 
 // Launch simulation
+// Launch simulation
 export function launchSimulation() {
   launched = true;
   fetchWind();
@@ -137,12 +139,14 @@ export function launchSimulation() {
   window.globalSimulationData.ILCA.capsized = false;
   window.globalSimulationData.ILCA.heelAngle = 0;
 
-
   window.globalSimulationData.ILCA.heading = 45;
   window.globalSimulationData.ILCA.speed = 0;
-
   window.globalSimulationData.ILCA.timer = 0;
+
+  // 🛠️ FIX: The shift engine now starts exactly when the user clicks 'Start Simulation'!
+  startWindShiftEngine();
 }
+
 
 // Stop simulation
 export function stopSimulation() {

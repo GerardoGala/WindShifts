@@ -1,7 +1,7 @@
 window.globalSimulationData = {
 
   // --- Wind state ---
-  windDirection: 0,
+  windDirection: 11,
   windSpeed: 0,   
 
   // Base coordinates (The Starting / Leeward Gate Area)
