@@ -12,9 +12,7 @@ window.globalSimulationData = {
   windwardMarkLat: 13.672710,
   windwardMarkLon: 121.401286,
   
-  // 🧭 LEG 2 TARGET: Symmetrical Gybe mark (125m North, 208m East)
-  gybeMarkLat: 13.671587,
-  gybeMarkLon: 121.402827, 
+
 
 
     // 🎯 The Leaflet marker instance reference

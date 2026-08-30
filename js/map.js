@@ -31,9 +31,6 @@ export function initMap() {
   const windwardMarkLat = window.globalSimulationData.windwardMarkLat;
   const windwardMarkLon = window.globalSimulationData.windwardMarkLon;
 
-  const gybeMarkLat = window.globalSimulationData.gybeMarkLat;
-  const gybeMarkLon = window.globalSimulationData.gybeMarkLon;
-
 
   // ==========================================================================
   // Buoy Icon
@@ -90,9 +87,6 @@ const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" heigh
 
   // --- Add the 3 Marks to the Map ---
   const windwardMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: buoyIcon })
-    .addTo(map);
-
-  const gybeMarker = L.marker([gybeMarkLat, gybeMarkLon], { icon: buoyIcon })
     .addTo(map);
 
   const leewardMarker = L.marker([leewardMarkLat, leewardMarkLon], { icon: buoyIcon })
@@ -237,11 +231,6 @@ window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMa
     [
       windwardMarkLat,
       windwardMarkLon
-    ],
-
-    [
-      gybeMarkLat,
-      gybeMarkLon
     ],
 
     [
