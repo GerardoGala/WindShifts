@@ -569,17 +569,7 @@ export function updateWindVaneControl() {
           border-bottom: 12px solid #ff4500;
         ">
         </div>
-        <!-- Balance Tail Line -->
-        <!-- 🛠️ FIX: Extended baseline width to cleanly contrast the pointer head -->
-        <div style="
-          position: absolute;
-          bottom: 0;
-          left: -11px;
-          width: 24px;
-          height: 4px;
-          background: #ff4500;
-        ">
-        </div>
+
       </div>
     </div>
 
