@@ -70,6 +70,9 @@ const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" heigh
     touchZoom: false
   });
 
+  // Make the default scale visible (appears in the bottom-left corner)
+L.control.scale().addTo(map);
+
   // --- Add the 3 Marks to the Map ---
   const windwardMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: buoyIcon })
     .addTo(map);

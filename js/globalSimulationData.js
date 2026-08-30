@@ -4,13 +4,13 @@ window.globalSimulationData = {
   windDirection: 11,
   windSpeed: 0,   
 
-  // Base coordinates (The Starting / Leeward Gate Area)
-  leewardMarkLat: 13.670464,
-  leewardMarkLon: 121.401286,
+// Base coordinates (The Starting / Leeward Gate Area)
+leewardMarkLat: 13.670464,
+leewardMarkLon: 121.401286,
 
-  // 🏁 LEG 1 TARGET: Exactly 250 meters due North of Leeward
-  windwardMarkLat: 13.672710,
-  windwardMarkLon: 121.401286,
+// 🏁 LEG 1 TARGET: Exactly 500 meters due North of Leeward (Doubled Course)
+windwardMarkLat: 13.674956,
+windwardMarkLon: 121.401286,
   
 
 
