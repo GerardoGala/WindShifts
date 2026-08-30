@@ -43,14 +43,22 @@ window.globalSimulationData = {
     maneuver: null,
     pointOfSail: "",
     heading: 45,
-    speed: 0,
-    sailorPosition: "Mid Center",
-    boomAngle: '0-8',
-    daggerboard: "Center",
-    vang: "Center",
-    downhaul: "Base",
-    outhaul: "Base",
-  
+    speed: 15,
+    sailorPosition: "Mid Center", //beating upwind at 15 knots of wind
+    boomAngle: 7,                 //beating upwind at 15 knots of wind
+    daggerboard: "Down",          //beating upwind at 15 knots of wind
+    vang: "Max",                  //beating upwind at 15 knots of wind
+    downhaul: "Max Luff",         //beating upwind at 15 knots of wind
+    outhaul: "Base",              //beating upwind at 15 knots of wind
+/*
+    sailorPosition: "Aft Center", //sailing downwind at 15 knots of wind
+    boomAngle: 90,             //sailing downwind at 15 knots of wind
+    daggerboard: "Center",       //sailing downwind at 15 knots of wind
+    vang: "Center",               //sailing downwind at 15 knots of wind
+    downhaul: "OFF",            //sailing downwind at 15 knots of wind
+    outhaul: "Full",              //sailing downwind at 15 knots of wind
+*/
+
     lat: 13.670464,   
     lon: 121.401286,
     timer: 0,
