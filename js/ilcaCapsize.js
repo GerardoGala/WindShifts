@@ -101,11 +101,11 @@ export function calculateHeelAndCapsize(pointOfSail, windSpeed, controls) {
     if (normalizedPosition === "aft") {
       weightModifier = 0.2;  // Safe profile - completely cancels death roll
     } else if (normalizedPosition === "hike hard") {
-      weightModifier = 1.65; // ❌ FIXED: Triggers a distinct rocking pendulum that breaks 45°
+      weightModifier = 1.65; // Triggers a distinct rocking pendulum that breaks 45°
     } else if (normalizedPosition === "mid center") {
-      weightModifier = 1.95; // ❌ FIXED: High instability from sitting center. Forces capsize.
+      weightModifier = 1.95; // High instability from sitting center. Forces capsize.
     } else {
-      weightModifier = 2.40; // ❌ MAXIMUM DANGER (Forward/Leeward) - Flips almost instantly
+      weightModifier = 2.40; // MAXIMUM DANGER (Forward/Leeward) - Flips almost instantly
     }
 
     const rollRiskIndex = weightModifier;
@@ -114,13 +114,14 @@ export function calculateHeelAndCapsize(pointOfSail, windSpeed, controls) {
     if (rollRiskIndex > 0.5) {
       isDeathRolling = true;
       
-      const timestamp = Date.now() / 1000;
-      const oscillationFrequency = 2.2; 
-      // Amplitudes are beefed up here to ensure they clear the 45-degree limit in under 5 seconds
+      // 🛠️ FIXED FOR SLOW MOTION: Swap real-world Date.now() out for your simulation step timer
+      // This synchronizes the rolling wave frequency perfectly with your 3-second step loop timing rhythm.
+      const simSeconds = controls.timer || 0;
+      const oscillationFrequency = 0.25; // Adjusted wave speed for step increments
       const oscillationAmplitude = rollRiskIndex * 30; 
       const windwardBias = -16 * rollRiskIndex; 
       
-      deathRollHeel = windwardBias + (Math.sin(timestamp * oscillationFrequency * Math.PI) * oscillationAmplitude);
+      deathRollHeel = windwardBias + (Math.sin(simSeconds * oscillationFrequency * Math.PI) * oscillationAmplitude);
     }
   }
 

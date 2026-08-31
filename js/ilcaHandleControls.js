@@ -5,6 +5,13 @@ export function handleControls(windDir, windSpeed) {
   const ilca = window.globalSimulationData.ILCA;
   let currentHeading = ilca.heading;
   
+  // ==========================================================================
+  // 🛠️ EDITABLE NO-GO ZONE CONFIGURATION
+  // ==========================================================================
+  // Lowered to 30 to narrow the no-go cone to a 330° through 30° window.
+  // This lets your boat sail much closer into the wind lines while beating.
+  const NO_GO_ZONE_DEGREES = 30; 
+
   // --- TRACK OLD TACK STATE ---
   // Calculate which tack we are on BEFORE the steering maneuver
   const relativeAngleBefore = ((currentHeading - windDir + 540) % 360) - 180; 
@@ -15,28 +22,15 @@ export function handleControls(windDir, windSpeed) {
 
   switch (ilca.maneuver) {
     case "tack": {
-      // ⛵ INTELLIGENT SINGLE-BUTTON TACK: Automatically decides which direction to swing
-      // based on the boat's active tack state before crossing the wind eye.
+      // ⛵ 🛠️ FIXED UPWIND SNAP ENHANCEMENT:
+      // Instantly calculates the clean upwind target lanes (45° or 315° relative to wind) 
+      // depending on whichever direction you are swinging from, bypassing stalls.
       if (isStarboardTackBefore) {
-        // Starboard tack requires turning to PORT (Left) across the wind axis
-        let targetHeading = (currentHeading - 45 + 360) % 360;
-        const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
-        
-        if (Math.abs(relativeAngleAfter) < 45) {
-          ilca.heading = (windDir - 45 + 360) % 360; // Clean snap to Port Close Hauled
-        } else {
-          ilca.heading = targetHeading;
-        }
+        // Crossing from Starboard to Port Tack -> Snap perfectly to Port Close Hauled (315° or -45° off wind)
+        ilca.heading = (windDir - 45 + 360) % 360; 
       } else {
-        // Port tack requires turning to STARBOARD (Right) across the wind axis
-        let targetHeading = (currentHeading + 45 + 360) % 360;
-        const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
-        
-        if (Math.abs(relativeAngleAfter) < 45) {
-          ilca.heading = (windDir + 45) % 360; // Clean snap to Starboard Close Hauled
-        } else {
-          ilca.heading = targetHeading;
-        }
+        // Crossing from Port to Starboard Tack -> Snap perfectly to Starboard Close Hauled (45° off wind)
+        ilca.heading = (windDir + 45) % 360;
       }
       break;
     }
@@ -46,14 +40,11 @@ export function handleControls(windDir, windSpeed) {
       let targetHeading = (currentHeading - 45 + 360) % 360;
       
       // Check if this left turn would land the bow inside the "In Irons" no-go zone.
-      // An ILCA stalls if it gets closer than 45° to the wind axis.
       const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
       
-      if (Math.abs(relativeAngleAfter) < 45) {
-        // ⛵ INTENTIONAL TACK COMPENSATOR: Instead of stalling in irons,
-        // snap the boat perfectly to the opposite upwind Close Hauled tack (-45° from wind)
+      if (Math.abs(relativeAngleAfter) < NO_GO_ZONE_DEGREES) {
+        // Snap perfectly to the opposite upwind Close Hauled tack relative to the wind
         ilca.heading = (windDir - 45 + 360) % 360;
-        //console.log(`⛵ Port Turn forced a tack! Compensating to Port Close Hauled at ${ilca.heading}° to avoid In Irons.`);
       } else {
         ilca.heading = targetHeading;
       }
@@ -67,11 +58,9 @@ export function handleControls(windDir, windSpeed) {
       // Check if this right turn would land the bow inside the "In Irons" no-go zone.
       const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
       
-      if (Math.abs(relativeAngleAfter) < 45) {
-        // ⛵ INTENTIONAL TACK COMPENSATOR: Instead of stalling in irons,
-        // snap the boat perfectly to the opposite upwind Close Hauled tack (+45° from wind)
+      if (Math.abs(relativeAngleAfter) < NO_GO_ZONE_DEGREES) {
+        // Snap perfectly to the opposite upwind Close Hauled tack relative to the wind
         ilca.heading = (windDir + 45) % 360;
-        //console.log(`⛵ Starboard Turn forced a tack! Compensating to Starboard Close Hauled at ${ilca.heading}° to avoid In Irons.`);
       } else {
         ilca.heading = targetHeading;
       }
@@ -88,16 +77,14 @@ export function handleControls(windDir, windSpeed) {
       break;
 
     case "bear-away": {
-      // Check if the boat is currently trapped inside the 45-degree "In Irons" zone
-      if (Math.abs(relativeAngleBefore) < 45) {
-        // ⛵ IN IRONS ESCAPE VALVE: Force the boat's heading directly out to a working 
-        // Close Hauled upwind alignment (45° off the wind) based on its current tack.
+      // Check if the boat is currently trapped inside the "In Irons" zone
+      if (Math.abs(relativeAngleBefore) < NO_GO_ZONE_DEGREES) {
+        // ⛵ IN IRONS ESCAPE VALVE: Force the boat's heading directly out to a working Close Hauled upwind alignment
         if (isStarboardTackBefore) {
-          ilca.heading = (windDir + 45) % 360; // Snap right out to Starboard Close Hauled
+          ilca.heading = (windDir + 45) % 360; 
         } else {
-          ilca.heading = (windDir - 45 + 360) % 360; // Snap left out to Port Close Hauled
+          ilca.heading = (windDir - 45 + 360) % 360; 
         }
-        //console.log(`⛵ Trapped In Irons! Bear away forced a clean recovery snap to Close Hauled at ${ilca.heading}°.`);
       } else {
         // ⛵ NORMAL OPERATION: Execute standard, smooth 3-degree adjustments when sailing freely
         if (isStarboardTackBefore) {
@@ -128,8 +115,6 @@ export function handleControls(windDir, windSpeed) {
       // Drops current speed by 35% instantly to simulate flapping sails and hull drag.
       const oldSpeed = ilca.speed || 0;
       ilca.speed = oldSpeed * 0.65;
-      
-      //console.log(`⛵ TACK DETECTED! Heading changed through the wind axis. Speed penalized from ${oldSpeed.toFixed(1)}kn to ${ilca.speed.toFixed(1)}kn.`);
     }
   }
 
@@ -143,14 +128,12 @@ export function handleControls(windDir, windSpeed) {
   // Calculate final relative angle to the wind (0° = dead into the wind)
   let angleToWind = Math.abs(((ilca.heading - windDir + 540) % 360) - 180);
 
-  if (angleToWind < 45) {
+  if (angleToWind < NO_GO_ZONE_DEGREES) {
     // 🛑 WE ARE PHYSICALLY POINTING IN THE NO-GO ZONE
     let currentSpeed = ilca.speed || 0;
 
     if (currentSpeed > 0.1) {
       // COASTING MOMENTUM: Let the boat glide through on its kinetic energy!
-      // 0.85 means it loses 15% of its speed per 1-second physics tick.
-      // The flapping, luffing sails act as air brakes, decaying speed over a few seconds.
       ilca.speed = currentSpeed * 0.85;
       ilca.pointOfSail = "In Irons (Coasting)";
     } else {
@@ -158,19 +141,9 @@ export function handleControls(windDir, windSpeed) {
       ilca.speed = 0;
       ilca.pointOfSail = "IN IRONS (Stalled)";
     }
-          console.log("pointOfSail", ilca.pointOfSail)
-  } else {
-    // ✅ FREELY SAILING: Fallback safety step
-    // If the boat just escaped the no-go zone but stalled down to 0, 
-    // give it a tiny kickstart so it can catch wind and begin accelerating again.
-    if ((ilca.speed || 0) === 0) {
-      ilca.speed = 0.5; 
-    }
-  }
-} // <--- This closes your export function handleControls
-
-
-
+    console.log("pointOfSail", ilca.pointOfSail);
+  } 
+} 
 
 function angleDiff(a, b) {
   const d = Math.abs(a - b) % 360;

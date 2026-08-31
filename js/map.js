@@ -486,9 +486,9 @@ export function updateWindVaneControl() {
   relativeWindAngle = (relativeWindAngle + 360) % 360;
 
   // ==========================================================================
-  // No-Go Zone Logic (Red warning text if within 45° of the bow)
+  // No-Go Zone Logic (Red warning text if within 30° of the bow)
   // ==========================================================================
-  const isInIrons = relativeWindAngle <= 45 || relativeWindAngle >= 315;
+  const isInIrons = relativeWindAngle <= 30 || relativeWindAngle >= 330;
   let textColor = "#475569";
   let statusText = "CLEAR";
   

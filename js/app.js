@@ -19,7 +19,7 @@ async function loadConfig() {
   // 1 = Normal speed (1-second steps)
   // 2 = Twice as slow (2-second intervals)
   // 3 = Three times as slow (3-second intervals)
-  window.globalSimulationData.slowMotionFactor = 2; 
+  window.globalSimulationData.slowMotionFactor = 3; 
 
   map = initMap();
 
@@ -41,8 +41,7 @@ async function loadConfig() {
       // ⏱️ TIMER STEP: Numerical seconds counter increments cleanly here
       window.globalSimulationData.ILCA.timer++;
 
-      // --- Capsize Halting Check ---
-      // --- 🛠️ MODIFIED: Capsize Autopsy Check (No Page Redirect) ---
+      // --- Capsize Halting Check & Autopsy Diagnostic ---
       if (window.globalSimulationData.ILCA.capsized) {
         console.warn("Simulation frozen due to capsize.");
         
@@ -83,13 +82,12 @@ async function loadConfig() {
         if (!autopsyDiv) {
           autopsyDiv = document.createElement("div");
           autopsyDiv.id = "capsizeAutopsyPanel";
-          // Inject it straight inside the controls parent container so it sits cleanly alongside your instruments
           const controlsParent = document.getElementById("controlsDiv") || document.body;
           controlsParent.appendChild(autopsyDiv);
         }
 
         autopsyDiv.style.display = "block";
-        autopsyDiv.style.background = "#fef2f2"; // Alert red tint
+        autopsyDiv.style.background = "#fef2f2"; 
         autopsyDiv.style.border = "2px solid #ef4444";
         autopsyDiv.style.borderRadius = "8px";
         autopsyDiv.style.padding = "16px";
@@ -115,21 +113,48 @@ async function loadConfig() {
         return;
       }
 
-
-      updateILCA(map);
-
+      // ============================================================================
+      // 🛠️ SEQUENTIAL PERFORMANCE COUPLING PASS
+      // ============================================================================
       const windSpeed = Number(window.globalSimulationData.windSpeed) || 0;
       const windDir = window.globalSimulationData.windDirection;
       const heading = window.globalSimulationData.ILCA.heading;
 
-      // --- Point of Sail ---
+      // 1. Calculate and sync active Point of Sail text strings
       const pointOfSail = getPointOfSail(windDir, heading);
-      window.globalSimulationData.ILCA.pointOfSail = pointOfSail;  // <-- store it
+      window.globalSimulationData.ILCA.pointOfSail = pointOfSail;  
       
       const controls = window.globalSimulationData.ILCA;
-      const newSpeed = applyControls(pointOfSail, windSpeed, controls); // ◄ Calculated via imported function
 
-      window.globalSimulationData.ILCA.speed = newSpeed;
+      // Explicitly bridge global property updates from your HTML button triggers
+      controls.boomAngle = parseFloat(window.globalSimulationData.ILCA.boomAngle) || 0.0;
+
+      // 2. Compute what the maximum potential speed is for your exact current setup targets
+      const targetPotentialSpeed = applyControls(pointOfSail, windSpeed, controls); 
+      
+      // 3. Fetch boat's running velocity tracker
+      let currentSpeed = parseFloat(window.globalSimulationData.ILCA.speed);
+      if (isNaN(currentSpeed)) {
+        currentSpeed = 0.0;
+      }
+
+      // 4. SMOOTH KINETIC MOMENTUM INTERPOLATION (The Acceleration Wave)
+      if (currentSpeed < targetPotentialSpeed) {
+        // ACCELERATION: Boat gathers speed gradually over time
+        currentSpeed += (targetPotentialSpeed - currentSpeed) * 0.20;
+      } else if (currentSpeed > targetPotentialSpeed) {
+        // DECELERATION: Sudden penalties or over-sheeting slides velocity down smoothly
+        currentSpeed -= (currentSpeed - targetPotentialSpeed) * 0.35;
+      }
+
+      // Lock tracking noise cleanly at dead stops
+      if (currentSpeed < 0.05) currentSpeed = 0.0;
+
+      // 5. Commit the calculated velocity shift to global variables
+      window.globalSimulationData.ILCA.speed = currentSpeed;
+
+      // 6. Execute map tracking displacement steps using the freshly calculated speed
+      updateILCA(map);
     }
 
     // Refresh overlays
@@ -142,23 +167,20 @@ async function loadConfig() {
     const heelDegSpan = document.getElementById("uiHeelDegrees");
 
     if (warningDiv && ilcaData) {
-      // Show dashboard element if boat heels past 30 degrees (and isn't flipped yet)
       if (ilcaData.heelAngle >= 30 && !ilcaData.capsized && launched) {
         warningDiv.style.display = "block";
         if (heelDegSpan) {
           heelDegSpan.textContent = Math.round(ilcaData.heelAngle);
         }
         
-        // Trigger intense shaking animation class if critically close to tipping over (38°+)
         if (ilcaData.heelAngle >= 38) {
           warningDiv.classList.add("danger-shake");
-          warningDiv.style.background = "#fca5a5"; // Deepen panel to warning red
+          warningDiv.style.background = "#fca5a5"; 
         } else {
           warningDiv.classList.remove("danger-shake");
-          warningDiv.style.background = "#fee2e2"; // Keep default alert tint
+          warningDiv.style.background = "#fee2e2"; 
         }
       } else {
-        // Suppress warning layout safely if flat or out of simulation window parameters
         warningDiv.style.display = "none";
         warningDiv.classList.remove("danger-shake");
       }
@@ -169,7 +191,7 @@ async function loadConfig() {
 // --- Clean, flat helper to sync the wind state ---
 async function updateWindFromAPI() {
   try {
-    const windData = await fetchWind(); // Returns { direction, speed }
+    const windData = await fetchWind(); 
     if (windData) {
       window.globalSimulationData.windDirection = Number(windData.direction);
       window.globalSimulationData.windSpeed = Number(windData.speed);
@@ -189,7 +211,7 @@ export function launchSimulation() {
   window.globalSimulationData.ILCA.heelAngle = 0;
 
   window.globalSimulationData.ILCA.heading = 45;
-  window.globalSimulationData.ILCA.speed = 0;
+  window.globalSimulationData.ILCA.speed = 0; // Starts safely dead-in-the-water
   window.globalSimulationData.ILCA.timer = 0;
 
   // The shift engine now starts exactly when the user clicks 'Start Simulation'!
@@ -214,10 +236,3 @@ function getPointOfSail(windDir, heading) {
   let rel = Math.abs(heading - windDir) % 360;
   if (rel > 180) rel = 360 - rel; 
 
-  if (rel <= 44)  return "In Irons";       
-  if (rel <= 60)  return "Close Hauled";   
-  if (rel <= 80)  return "Close Reach";    
-  if (rel <= 100) return "Beam Reach";     
-  if (rel <= 150) return "Broad Reach";    
-  return "Running";                        
-}

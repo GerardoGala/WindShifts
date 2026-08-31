@@ -43,8 +43,8 @@ windwardMarkLon: 121.401286,
     maneuver: null,
     pointOfSail: "",
     heading: 45,
-    speed: 15,
-    sailorPosition: "Hiking Hard", //beating upwind at 15 knots of wind
+    speed: 0,
+    sailorPosition: "Hike Hard", //beating upwind at 15 knots of wind
     boomAngle: 15,                 //beating upwind at 15 knots of wind
     daggerboard: "Down",          //beating upwind at 15 knots of wind
     vang: "Max",                  //beating upwind at 15 knots of wind

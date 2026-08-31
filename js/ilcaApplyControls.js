@@ -12,7 +12,8 @@ function getTrimMultiplier(currentValue, targetValue, penaltyWeight = 0.4) {
 
 /**
  * Calculates a range multiplier so any boom angle inside the manual's specified 
- * windows (e.g., 7° to 10°) yields peak efficiency, penalized smoothly outside it.
+ * windows yields peak efficiency, penalized smoothly outside it.
+ * 🛠️ FIXED MAIN SHEET LOOPHOLE: Dropping drive to 0 if completely out of trim!
  */
 function getBoomRangeMultiplier(currentAngle, minAngle, maxAngle) {
   let deviation = 0;
@@ -21,41 +22,31 @@ function getBoomRangeMultiplier(currentAngle, minAngle, maxAngle) {
   } else if (currentAngle > maxAngle) {
     deviation = currentAngle - maxAngle;
   }
-  // Smoothly penalizes efficiency the further you drift from the optimal angle target
-  return Math.max(0.5, 1.05 - ((deviation / 90.0) * 0.75));
+  
+  // ⛵ TRUE SAILING PHYSICS: If the boom angle is more than 15 degrees out
+  // from the optimal target window, the sail completely stalls or loses all drive.
+  if (deviation > 15) {
+    return 0.0; // The boat stops dead in the water!
+  }
+  
+  // Smooth linear penalty for minor imperfections (0 to 15 degrees off target)
+  return 1.05 - (deviation * 0.03);
 }
 
 export function applyControls(pointOfSail, windSpeed, controls) {
-  // 🔬 DEBUG TRACER
-  //console.log("PAYLOAD CHECK:", JSON.stringify(controls));
-
-  // ==========================================================================
-  // 🛠️ FIXED: SPECIAL CASE: IN IRONS & MOMENTUM DECAY
-  // Matches "In Irons", "In Irons (Coasting)", or "IN IRONS (Stalled)"
-  // ==========================================================================
+  // --- SPECIAL CASE: IN IRONS & MOMENTUM DECAY ---
   if (pointOfSail && pointOfSail.includes("In Irons")) {
-    
-    // Check if the boat is completely dead in the water or still coasting
     const isStalled = pointOfSail.includes("Stalled") || (controls.speed || 0) <= 0.1;
 
     if (isStalled) {
-      // 🛑 STALLED STATE: Complete kinetic death
       controls.heelingForceMultiplier = 0.0;
       let currentClinometer = controls.clinometer || 0;
-      controls.clinometer = currentClinometer + (0 - currentClinometer) * 0.6; // Flat hull
+      controls.clinometer = currentClinometer + (0 - currentClinometer) * 0.6;
       return 0.0; 
     } else {
-      // ⛵ COASTING STATE: Decouple instant force drop to match handleControls physics!
-      // Reduce the heeling force multiplier slightly because sails are luffing, 
-      // but let the boat maintain its current velocity decay line.
       controls.heelingForceMultiplier = 0.2; 
-      
-      // Let the clinometer bleed off its heel angle smoothly over time rather than snapping to 0
       let currentClinometer = controls.clinometer || 0;
       controls.clinometer = currentClinometer * 0.85; 
-
-      // Return a minimal base speed calculation factor so the physics loops don't lock at 0 
-      // while handleControls handles the actual 15% step decay.
       return (controls.speed || 0.5) / windSpeed;
     }
   }
@@ -88,13 +79,12 @@ export function applyControls(pointOfSail, windSpeed, controls) {
   const o = controls.outhaul;         
   const db = controls.daggerboard;    
 
-  // 🎯 ANALOG UPDATE: Accept a clean float numeric value directly from your UI input slider/ticks
   let numericBoomAngle = parseFloat(controls.boomAngle);
   if (isNaN(numericBoomAngle)) {
-    numericBoomAngle = 0.0; // Fallback safe floor
+    numericBoomAngle = 0.0;
   }
 
-  // --- 1. BOOM ANGLE PENALTY ---
+  // --- 1. BOOM ANGLE PENALTY (Now features strict stall out logic) ---
   modifier *= getBoomRangeMultiplier(numericBoomAngle, targets.minBoom, targets.maxBoom);
 
   // --- 2. SAIL RIG CONTROLS PENALTIES ---

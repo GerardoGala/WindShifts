@@ -5,10 +5,6 @@ export let baseWindSpeedMS = 5.14; // 10 knots
 
 const WIND_DIRECTION = 0;
 
-// Wind strength settings
-const LIGHT_WIND_KNOTS = 15;
-const STRONG_WIND_KNOTS = 12;
-
 // Background tracking variables for natural shifts
 let windShiftIntervalId = null;
 let elapsedTime = 0;
@@ -18,21 +14,24 @@ let elapsedTime = 0;
  */
 export function fetchWind() {
     window.globalSimulationData = window.globalSimulationData || {};
+    
+    // 🎯 INITIAL LESSON PARAMETERS: Locked tightly to 0° at 15 knots at spawn
     window.globalSimulationData.windDirection = WIND_DIRECTION;
-    window.globalSimulationData.windSpeed = LIGHT_WIND_KNOTS;
+    window.globalSimulationData.windSpeed = 15; 
+    
     updateWindDisplay();
 }
 
 /**
- * Change the wind strength.
+ * Change the wind strength manually if triggered via menus.
  */
 export function setWindStrength(strength) {
     if (!window.globalSimulationData) return;
 
     if (strength === "light") {
-        window.globalSimulationData.windSpeed = LIGHT_WIND_KNOTS;
+        window.globalSimulationData.windSpeed = 5;  // 5 Knots
     } else if (strength === "strong") {
-        window.globalSimulationData.windowSimulationData = STRONG_WIND_KNOTS;
+        window.globalSimulationData.windSpeed = 15; // 15 Knots
     }
     updateWindDisplay();
 }
@@ -49,14 +48,14 @@ export function startWindShiftEngine() {
 
     const FORCE_STATIC_NORTH = false; 
     
-    // 🛠️ DYNAMIC LINK: Pulls factor straight from shared global simulation settings
+    // Pulls the slow-motion coefficient factor straight from your hardcoded configuration
     const windSlowFactor = window.globalSimulationData?.slowMotionFactor || 1;
     const baseIntervalDelay = 500 * windSlowFactor;
 
     windShiftIntervalId = setInterval(() => {
         if (!window.globalSimulationData) return;
 
-        // Step elapsed time according to the shared global setting multiplier
+        // Step elapsed timeline tracking according to the shared global setting multiplier
         elapsedTime += (0.5 * windSlowFactor);
 
         let finalDirection = WIND_DIRECTION;
@@ -64,14 +63,23 @@ export function startWindShiftEngine() {
         if (FORCE_STATIC_NORTH) {
             finalDirection = WIND_DIRECTION; 
         } else {
-            // ⏳ ADJUSTED GRACE PERIOD CHECK
-            if (elapsedTime <= (5.0 * windSlowFactor)) {
-                finalDirection = WIND_DIRECTION;
+            // ============================================================================
+            // ⏳ 🛠️ FIXED STEP: 10-SECOND ROCK-SOLID GRACE PERIOD
+            // ============================================================================
+            // Stretches out the timeline to ensure the wind stays perfectly frozen at 0° 
+            // for 10 full simulation seconds, matching your 15-knot upwind target rules.
+            const totalGracePeriodSeconds = 10.0;
+
+            if (elapsedTime <= (totalGracePeriodSeconds * windSlowFactor)) {
+                finalDirection = WIND_DIRECTION; // Rock-solid wind from 0° North
             } else {
                 // 1. RHYTHMIC OSCILLATION (The Marine Shift)
                 const wavePeriod = 40.0 * windSlowFactor;
                 const shiftMagnitude = 12.0;
-                let adjustedTime = elapsedTime - (5.0 * windSlowFactor); 
+                
+                // Subtracting the grace period milestone baseline shifts the start 
+                // timeline of the sine wave smoothly out past the 10-second mark
+                let adjustedTime = elapsedTime - (totalGracePeriodSeconds * windSlowFactor); 
                 
                 let dynamicDirection = WIND_DIRECTION + 
                     Math.sin((adjustedTime * 2 * Math.PI) / wavePeriod) * shiftMagnitude;
@@ -99,7 +107,7 @@ export function stopWindShiftEngine() {
 }
 
 /**
- * Update the wind display.
+ * Update the wind display text content layout.
  */
 function updateWindDisplay() {
     const windDiv = document.getElementById("windStatus");
