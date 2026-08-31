@@ -58,11 +58,20 @@ export function applyControls(pointOfSail, windSpeed, controls) {
   }
 
   // Define global base efficiencies based on direction heading
-  let baseFactor = 0.5;
-  if (pointOfSail === "Close Hauled") baseFactor = 0.7;
-  if (pointOfSail === "Close Reach" || pointOfSail === "Broad Reach") baseFactor = 1.0;
-  if (pointOfSail === "Beam Reach") baseFactor = 1.2;
-  if (pointOfSail === "Running") baseFactor = 0.8;
+  let baseFactor = 0.3; // Default floor
+  
+  if (pointOfSail === "Close Hauled") {
+    baseFactor = 0.32; // 15 kn wind * 0.32 = ~4.8 knots upwind top speed!
+  }
+  if (pointOfSail === "Close Reach" || pointOfSail === "Broad Reach") {
+    baseFactor = 0.45; // Fast reaching lanes (~6.7 knots)
+  }
+  if (pointOfSail === "Beam Reach") {
+    baseFactor = 0.52; // Pure peak beam tracking (~7.8 knots)
+  }
+  if (pointOfSail === "Running") {
+    baseFactor = 0.38; // Running dead downwind (~5.7 knots)
+  }
 
   // --- FIXED: ROUNDED DECIMAL & SAFE FALLBACK TARGETS ---
   const roundedWindSpeed = Math.round(windSpeed || 0);

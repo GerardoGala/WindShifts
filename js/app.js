@@ -19,7 +19,7 @@ async function loadConfig() {
   // 1 = Normal speed (1-second steps)
   // 2 = Twice as slow (2-second intervals)
   // 3 = Three times as slow (3-second intervals)
-  window.globalSimulationData.slowMotionFactor = 3; 
+  window.globalSimulationData.slowMotionFactor = 1; 
 
   map = initMap();
 
