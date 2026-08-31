@@ -44,18 +44,7 @@ export function initMap() {
     popupAnchor: [0, -10]
   });
 
-// =========================================================================
-// 🟢 STREAMLINED STATIC GREEN TARGET GLOW (No Flashing)
-// =========================================================================
 
-// A clean, solid green circle with a soft outer frame (40px wide)
-const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="#00FF00" opacity="0.4" stroke="#00CC00" stroke-width="2"/></svg>';
-  const greenTargetIcon = L.icon({
-    iconUrl: "data:image/svg+xml;base64," + btoa(greenTargetSVG),
-    iconSize: [48, 48],
-    iconAnchor: [24, 24],
-    popupAnchor: [0, -24]
-  });
 
   // ==========================================================================
   // Create Leaflet Map
@@ -71,16 +60,57 @@ const greenTargetSVG = '<svg xmlns="http://www.w3.org/2000/svg" width="48" heigh
   });
 
   // Make the default scale visible (appears in the bottom-left corner)
-L.control.scale().addTo(map);
+  L.control.scale().addTo(map);
 
-  // --- Add the 3 Marks to the Map ---
-  const windwardMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: buoyIcon })
-    .addTo(map);
+  // --- 1. Base Mark Setup ---
+  //const windwardMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: buoyIcon })
+  //  .addTo(map);
   const leewardMarker = L.marker([leewardMarkLat, leewardMarkLon], { icon: buoyIcon })
     .addTo(map);
-  // --- Add the green target marker on top of the windward Mark ---
-  window.globalSimulationData.activeMarker = L.marker([windwardMarkLat, windwardMarkLon], { icon: greenTargetIcon })
+
+  // --- 2. Calculate the Finishing Pin Buoy Coordinates ---
+  // The course center line runs up windwardMarkLon. To center a 900m gate, 
+  // we shift one pin 400m West (-) and the opposite pin 400m East (+).
+  const metersPerLngDegree = 111320 * Math.cos(windwardMarkLat * Math.PI / 180);
+  const halfLineWidthMeters = 400; // 800m total width / 2
+  const lngDisplacement = halfLineWidthMeters / metersPerLngDegree;
+
+  // Calculate the left (West) and right (East) anchors of the finish line channel
+  const finishLeftPinLon = windwardMarkLon - lngDisplacement;
+  const finishRightPinLon = windwardMarkLon + lngDisplacement;
+
+  // 🛠️ REPLACEMENT BUOYS: Clear out old single markers and drop the two boundary buoys
+  // Note: If you want to keep the original windward marker visible in the exact center, 
+  // you can uncomment it or leave it as is.
+  const finishLeftMarker = L.marker([windwardMarkLat, finishLeftPinLon], { icon: buoyIcon })
     .addTo(map);
+  const finishRightMarker = L.marker([windwardMarkLat, finishRightPinLon], { icon: buoyIcon })
+    .addTo(map);
+
+  // --- 3. Draw the Green Finish Line Gate (Centered across 900 meters) ---
+  const finishLineCoordinates = [
+    [windwardMarkLat, finishLeftPinLon],  // Left Side Boundary Pin (West)
+    [windwardMarkLat, finishRightPinLon]  // Right Side Boundary Pin (East)
+  ];
+
+  L.polyline(finishLineCoordinates, {
+    color: '#22c55e',       // Bright Green
+    weight: 5,              // Clean visible line thickness
+    dashArray: '8, 8',      // Maritime dashed line pattern
+    opacity: 0.95,
+    pane: 'overlayPane'
+  }).addTo(map);
+
+
+
+
+
+  // ⚡ THE CRITICAL FIX: Forces Leaflet to recalculate bounds and redraw hidden vectors
+  setTimeout(() => {
+    map.invalidateSize();
+  }, 100);
+
+//page break
 
   // ==========================================================================
   // ILCA STATUS CONTROL
