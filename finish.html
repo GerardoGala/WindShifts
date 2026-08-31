@@ -61,7 +61,7 @@
       <h2 class="text-warning fw-bold">Exam Failed</h2>
       <div class="alert alert-warning font-monospace text-center fw-bold mt-3">REASON: EXCEEDED MAXIMUM COURSE LIMIT</div>
       <p class="lead mt-3 text-secondary">
-        Your race time of <strong id="raceTimeFail" class="text-dark">--</strong> seconds exceeded the maximum allowable target testing limit of 180 seconds.
+        Your race time of <strong id="raceTimeFail" class="text-dark">--</strong> seconds exceeded the maximum allowable target testing limit of 370 seconds.
       </p>
     </div>
 
@@ -84,10 +84,10 @@
       document.getElementById("death-roll-fail").style.display = "block";
     } else if (reasonValue === 'leeward_heel') {
       document.getElementById("leeward-fail").style.display = "block";
-    } else if (raceTimeValue > 180) {
+    } else if (raceTimeValue > 370) {
       document.getElementById("time-fail").style.display = "block";
       document.getElementById("raceTimeFail").innerText = raceTimeValue.toFixed(1);
-    } else if (raceTimeValue <= 180 && raceTimeValue > 0) {
+    } else if (raceTimeValue <= 370 && raceTimeValue > 0) {
       document.getElementById("pass").style.display = "block";
       document.getElementById("raceTimePass").innerText = raceTimeValue.toFixed(1);
     } else {
