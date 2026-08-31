@@ -236,3 +236,10 @@ function getPointOfSail(windDir, heading) {
   let rel = Math.abs(heading - windDir) % 360;
   if (rel > 180) rel = 360 - rel; 
 
+// 🛠️ BALANCED INTERSECT: Synced tightly with your narrowed 30° steering parameters
+if (rel <= 30)  return "In Irons";
+if (rel <= 60)  return "Close Hauled";
+if (rel <= 80)  return "Close Reach";
+if (rel <= 100) return "Beam Reach";
+if (rel <= 150) return "Broad Reach";
+return "Running";}
