@@ -66,20 +66,29 @@
       </div>
     </div>
 
-    <div id="controlsDiv" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-      <!-- Sheet controls row -->
-      <div id="sheetDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
-        <button class="control-button" onclick="handleSheetIn()" style="flex: 1; height: 100%;">SHEET IN</button>
-        <button class="control-button" onclick="handleSheetOut()" style="flex: 1; height: 100%;">SHEET OUT</button>
-      </div>
+<div id="controlsDiv" style="flex: 3; display: flex; flex-direction: column; gap: 8px;">
+  
+  <!-- Sheet controls row -->
+  <div id="sheetDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
+    <button class="control-button" onclick="handleSheetIn()" style="flex: 1; height: 100%;">SHEET IN</button>
+    <button class="control-button" onclick="handleSheetOut()" style="flex: 1; height: 100%;">SHEET OUT</button>
+  </div>
 
-    </div>
+  <!-- 🛠️ FIXED WHEELHOUSE: Assigned correct maneuver tags and nested within controlsDiv -->
+  <div id="headingDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
+    <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'bear-away'" style="flex: 1; height: 100%;">BEAR AWAY</button>
+    <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'head-up'" style="flex: 1; height: 100%;">HEAD UP</button>
+  </div>
 
-    <!-- Steering / Tacking controls row -->
-    <div id="tackDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
-      <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-port'" style="flex: 1; height: 100%;">TURN PORT</button>
-      <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'turn-starboard'" style="flex: 1; height: 100%;">TURN STARBOARD</button>
-    </div>
+  <!-- Steering / Tacking controls row -->
+  <div id="tackDiv" class="control-row" style="display: flex; flex: 1; align-items: stretch;">
+    <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'tack'" style="flex: 1; height: 100%;">TACK</button>
+  </div>
+
+</div>
+
+
+
   </div>
 
   

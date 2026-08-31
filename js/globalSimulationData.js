@@ -67,6 +67,7 @@ windwardMarkLon: 121.401286,
     distanceToRC: 0,
     bearingToRC: 0,
     vmg: 0,
-    clinometer: 0
+    clinometer: 0,
+    slowMotionFactor: 3
   }
 };

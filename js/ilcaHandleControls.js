@@ -14,6 +14,33 @@ export function handleControls(windDir, windSpeed) {
   const STEERING_STEP = 3; 
 
   switch (ilca.maneuver) {
+    case "tack": {
+      // ⛵ INTELLIGENT SINGLE-BUTTON TACK: Automatically decides which direction to swing
+      // based on the boat's active tack state before crossing the wind eye.
+      if (isStarboardTackBefore) {
+        // Starboard tack requires turning to PORT (Left) across the wind axis
+        let targetHeading = (currentHeading - 45 + 360) % 360;
+        const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
+        
+        if (Math.abs(relativeAngleAfter) < 45) {
+          ilca.heading = (windDir - 45 + 360) % 360; // Clean snap to Port Close Hauled
+        } else {
+          ilca.heading = targetHeading;
+        }
+      } else {
+        // Port tack requires turning to STARBOARD (Right) across the wind axis
+        let targetHeading = (currentHeading + 45 + 360) % 360;
+        const relativeAngleAfter = ((targetHeading - windDir + 540) % 360) - 180;
+        
+        if (Math.abs(relativeAngleAfter) < 45) {
+          ilca.heading = (windDir + 45) % 360; // Clean snap to Starboard Close Hauled
+        } else {
+          ilca.heading = targetHeading;
+        }
+      }
+      break;
+    }
+
     case "turn-port": {
       // Calculate a standard 45-degree turn left
       let targetHeading = (currentHeading - 45 + 360) % 360;
@@ -83,6 +110,7 @@ export function handleControls(windDir, windSpeed) {
     }
   }
 
+
   // --- TACK PENALTY EVALUATION LAYER ---
   // Calculate which tack we are on AFTER the steering maneuver completed
   const relativeAngleFinal = ((ilca.heading - windDir + 540) % 360) - 180;
@@ -105,10 +133,43 @@ export function handleControls(windDir, windSpeed) {
     }
   }
 
+
   // Clear the maneuver state so it doesn't loop infinitely 
-  // (Assuming your engine handles resets elsewhere, otherwise leave as is)
   ilca.maneuver = null; 
-}
+
+  // ==========================================================================
+  // ⛵ KINETIC MOMENTUM & "IN IRONS" DRAG LAYER
+  // ==========================================================================
+  // Calculate final relative angle to the wind (0° = dead into the wind)
+  let angleToWind = Math.abs(((ilca.heading - windDir + 540) % 360) - 180);
+
+  if (angleToWind < 45) {
+    // 🛑 WE ARE PHYSICALLY POINTING IN THE NO-GO ZONE
+    let currentSpeed = ilca.speed || 0;
+
+    if (currentSpeed > 0.1) {
+      // COASTING MOMENTUM: Let the boat glide through on its kinetic energy!
+      // 0.85 means it loses 15% of its speed per 1-second physics tick.
+      // The flapping, luffing sails act as air brakes, decaying speed over a few seconds.
+      ilca.speed = currentSpeed * 0.85;
+      ilca.pointOfSail = "In Irons (Coasting)";
+    } else {
+      // MOMENTUM DEPLETED: The boat is officially dead in the water trapped in irons
+      ilca.speed = 0;
+      ilca.pointOfSail = "IN IRONS (Stalled)";
+    }
+          console.log("pointOfSail", ilca.pointOfSail)
+  } else {
+    // ✅ FREELY SAILING: Fallback safety step
+    // If the boat just escaped the no-go zone but stalled down to 0, 
+    // give it a tiny kickstart so it can catch wind and begin accelerating again.
+    if ((ilca.speed || 0) === 0) {
+      ilca.speed = 0.5; 
+    }
+  }
+} // <--- This closes your export function handleControls
+
+
 
 
 function angleDiff(a, b) {

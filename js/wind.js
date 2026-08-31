@@ -17,108 +17,79 @@ let elapsedTime = 0;
  * Start the permanent training wind baseline values (Static at boot).
  */
 export function fetchWind() {
-
-    // Initialize global simulation data
-    window.globalSimulationData =
-        window.globalSimulationData || {};
-
-    window.globalSimulationData.windDirection =
-        WIND_DIRECTION;
-
-    // Default = light wind
-    window.globalSimulationData.windSpeed =
-        LIGHT_WIND_KNOTS;
-
+    window.globalSimulationData = window.globalSimulationData || {};
+    window.globalSimulationData.windDirection = WIND_DIRECTION;
+    window.globalSimulationData.windSpeed = LIGHT_WIND_KNOTS;
     updateWindDisplay();
-    
-    // Static baseline established. Awaits the Start button to run oscillations.
 }
-
 
 /**
  * Change the wind strength.
  */
 export function setWindStrength(strength) {
-
-    if (!window.globalSimulationData) {
-        return;
-    }
+    if (!window.globalSimulationData) return;
 
     if (strength === "light") {
-
-        window.globalSimulationData.windSpeed =
-            LIGHT_WIND_KNOTS;
-
+        window.globalSimulationData.windSpeed = LIGHT_WIND_KNOTS;
     } else if (strength === "strong") {
-
-        window.globalSimulationData.windSpeed =
-            STRONG_WIND_KNOTS;
+        window.globalSimulationData.windowSimulationData = STRONG_WIND_KNOTS;
     }
-
     updateWindDisplay();
 }
 
-
 /**
  * Active background loop that calculates and injects natural oscillations into the sea breeze.
- * Triggered exactly when the user clicks 'Start Simulation'.
- */
-/**
- * Active background loop that calculates and injects natural oscillations into the sea breeze.
- * Triggered exactly when the user clicks 'Start Simulation'.
- * Includes a 5-second stable grace period at startup.
  */
 export function startWindShiftEngine() {
-    // Clear any loose background loops to prevent overlapping threads
     if (windShiftIntervalId) {
         clearInterval(windShiftIntervalId);
     }
 
     elapsedTime = 0;
 
-    // Run a smooth update loop every 500ms to keep the needle fluid
+    const FORCE_STATIC_NORTH = false; 
+    
+    // 🛠️ DYNAMIC LINK: Pulls factor straight from shared global simulation settings
+    const windSlowFactor = window.globalSimulationData?.slowMotionFactor || 1;
+    const baseIntervalDelay = 500 * windSlowFactor;
+
     windShiftIntervalId = setInterval(() => {
         if (!window.globalSimulationData) return;
 
-        elapsedTime += 0.5;
+        // Step elapsed time according to the shared global setting multiplier
+        elapsedTime += (0.5 * windSlowFactor);
 
         let finalDirection = WIND_DIRECTION;
 
-        // ⏳ 5-SECOND GRACE PERIOD CHECK
-        if (elapsedTime <= 5.0) {
-            // Keep wind perfectly rock-solid at 0° so the boat can gather forward speed
-            finalDirection = WIND_DIRECTION;
+        if (FORCE_STATIC_NORTH) {
+            finalDirection = WIND_DIRECTION; 
         } else {
-            // 1. RHYTHMIC OSCILLATION (The Marine Shift)
-            // Subtracting 5 seconds from the wave timeline ensures the sine wave begins 
-            // smoothly from 0 right after the grace period ends.
-            const wavePeriod = 40.0;
-            const shiftMagnitude = 12.0;
-            let adjustedTime = elapsedTime - 5.0; 
-            
-            let dynamicDirection = WIND_DIRECTION + 
-                Math.sin((adjustedTime * 2 * Math.PI) / wavePeriod) * shiftMagnitude;
+            // ⏳ ADJUSTED GRACE PERIOD CHECK
+            if (elapsedTime <= (5.0 * windSlowFactor)) {
+                finalDirection = WIND_DIRECTION;
+            } else {
+                // 1. RHYTHMIC OSCILLATION (The Marine Shift)
+                const wavePeriod = 40.0 * windSlowFactor;
+                const shiftMagnitude = 12.0;
+                let adjustedTime = elapsedTime - (5.0 * windSlowFactor); 
+                
+                let dynamicDirection = WIND_DIRECTION + 
+                    Math.sin((adjustedTime * 2 * Math.PI) / wavePeriod) * shiftMagnitude;
 
-            // 2. LOW-FREQUENCY NOISE (The Needle Jitter)
-            const microJitter = (Math.random() - 0.5) * 2.0; // ±1.0 degree variation
+                // 2. LOW-FREQUENCY NOISE (The Needle Jitter)
+                const microJitter = (Math.random() - 0.5) * 2.0; 
 
-            // Combine and normalize to a positive 360-degree compass circle
-            finalDirection = (dynamicDirection + microJitter + 360) % 360;
+                finalDirection = (dynamicDirection + microJitter + 360) % 360;
+            }
         }
 
-        // Save the calculated value to global scope
         window.globalSimulationData.windDirection = Math.round(finalDirection);
-
-        // Update display text and push to instruments
         updateWindDisplay();
-    }, 500);
+    }, baseIntervalDelay); 
 }
-
-
 
 /**
  * Clean up the wind engine.
- * Call this when a student capsizes or resets the map view entirely.
  */
 export function stopWindShiftEngine() {
     if (windShiftIntervalId) {
@@ -127,24 +98,14 @@ export function stopWindShiftEngine() {
     }
 }
 
-
 /**
  * Update the wind display.
  */
 function updateWindDisplay() {
-
-    const windDiv =
-        document.getElementById("windStatus");
-
+    const windDiv = document.getElementById("windStatus");
     if (windDiv) {
-
-        const windSpeed =
-            window.globalSimulationData.windSpeed;
-
-        const windDirection =
-            window.globalSimulationData.windDirection;
-
-        windDiv.textContent =
-            `🌬️ Wind: ${windSpeed} knots from ${windDirection}°`;
+        const windSpeed = window.globalSimulationData.windSpeed;
+        const windDirection = window.globalSimulationData.windDirection;
+        windDiv.textContent = `🌬️ Wind: ${windSpeed} knots from ${windDirection}°`;
     }
 }

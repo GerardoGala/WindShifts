@@ -29,12 +29,35 @@ export function applyControls(pointOfSail, windSpeed, controls) {
   // 🔬 DEBUG TRACER
   //console.log("PAYLOAD CHECK:", JSON.stringify(controls));
 
-  // --- SPECIAL CASE: IN IRONS ---
-  if (pointOfSail === "In Irons") {
-    controls.heelingForceMultiplier = 0.0;
-    let currentClinometer = controls.clinometer || 0;
-    controls.clinometer = currentClinometer + (0 - currentClinometer) * 0.6;
-    return 0.0;
+  // ==========================================================================
+  // 🛠️ FIXED: SPECIAL CASE: IN IRONS & MOMENTUM DECAY
+  // Matches "In Irons", "In Irons (Coasting)", or "IN IRONS (Stalled)"
+  // ==========================================================================
+  if (pointOfSail && pointOfSail.includes("In Irons")) {
+    
+    // Check if the boat is completely dead in the water or still coasting
+    const isStalled = pointOfSail.includes("Stalled") || (controls.speed || 0) <= 0.1;
+
+    if (isStalled) {
+      // 🛑 STALLED STATE: Complete kinetic death
+      controls.heelingForceMultiplier = 0.0;
+      let currentClinometer = controls.clinometer || 0;
+      controls.clinometer = currentClinometer + (0 - currentClinometer) * 0.6; // Flat hull
+      return 0.0; 
+    } else {
+      // ⛵ COASTING STATE: Decouple instant force drop to match handleControls physics!
+      // Reduce the heeling force multiplier slightly because sails are luffing, 
+      // but let the boat maintain its current velocity decay line.
+      controls.heelingForceMultiplier = 0.2; 
+      
+      // Let the clinometer bleed off its heel angle smoothly over time rather than snapping to 0
+      let currentClinometer = controls.clinometer || 0;
+      controls.clinometer = currentClinometer * 0.85; 
+
+      // Return a minimal base speed calculation factor so the physics loops don't lock at 0 
+      // while handleControls handles the actual 15% step decay.
+      return (controls.speed || 0.5) / windSpeed;
+    }
   }
 
   // Group reaching vectors under one conceptual manual header

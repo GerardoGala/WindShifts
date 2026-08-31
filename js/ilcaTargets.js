@@ -20,6 +20,7 @@ export const SIMULATION_VALUES = {
 /**
  * Strict database mirroring the proTip.html specification matrix.
  * Updated to support Light (3-5 kn) and Moderate (6-14 kn) split!
+ * 🛠️ ADDED: Universal "In Irons" fallback mirrors to protect dynamic lookups.
  */
 export const SCENARIO_TARGETS = {
   "Close Hauled": {
@@ -99,5 +100,19 @@ export const SCENARIO_TARGETS = {
       downhaul: "Center",   
       outhaul: "Full" 
     }
+  },
+  
+  // ==========================================================================
+  // ⛵ SAFE LOOKUP HOOK FOR NO-GO STATE VARIATIONS
+  // Prevents crash exceptions if a sub-module tries to index targets during irons
+  // ==========================================================================
+  "In Irons": {
+    "Light": { minBoom: 0, maxBoom: 0, sailor: "Forward", daggerboard: "Down", vang: "Ease", downhaul: "Base", outhaul: "Base" },
+    "Moderate": { minBoom: 0, maxBoom: 0, sailor: "Mid Center", daggerboard: "Down", vang: "Center", downhaul: "Base", outhaul: "Base" },
+    "Heavy": { minBoom: 0, maxBoom: 0, sailor: "Hike Hard", daggerboard: "Down", vang: "Max", downhaul: "Max Luff", outhaul: "Flat" }
   }
 };
+
+// Map variants to point directly to the base fallback data structure
+SCENARIO_TARGETS["In Irons (Coasting)"] = SCENARIO_TARGETS["In Irons"];
+SCENARIO_TARGETS["IN IRONS (Stalled)"] = SCENARIO_TARGETS["In Irons"];
