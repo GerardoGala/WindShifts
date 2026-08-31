@@ -42,25 +42,79 @@ async function loadConfig() {
       window.globalSimulationData.ILCA.timer++;
 
       // --- Capsize Halting Check ---
+      // --- 🛠️ MODIFIED: Capsize Autopsy Check (No Page Redirect) ---
       if (window.globalSimulationData.ILCA.capsized) {
-        console.warn("Simulation stopped due to capsize.");
+        console.warn("Simulation frozen due to capsize.");
         
-        // Hide warning bar and clear active loops
+        // 1. Freeze the master loop clock immediately
+        launched = false; 
+        if (masterIntervalId) {
+          clearInterval(masterIntervalId);
+          masterIntervalId = null;
+        }
+
+        // 2. Safely halt the wind shift engine too so numbers stop jittering
+        if (typeof stopWindShiftEngine === 'function') {
+          stopWindShiftEngine();
+        }
+
+        // 3. Hide the temporary shaking warning bar
         const warningDiv = document.getElementById("heelWarningContainer");
         if (warningDiv) {
           warningDiv.style.display = "none";
-          warningDiv.classList.remove("danger-shake");
         }
 
-        const currentRaceTime = window.globalSimulationData?.raceTime || 0;
-        const failureReason = window.globalSimulationData.ILCA.capsizeReason || "leeward_heel";
+        // 4. Extract telemetry and reason code
+        const failureReasonCode = window.globalSimulationData.ILCA.capsizeReason || "leeward_heel";
+        const finalTime = window.globalSimulationData.ILCA.timer || 0;
+        
+        // Translate the code into a clear, helpful lesson
+        let autopsyMessage = "";
+        if (failureReasonCode === "death_roll") {
+          autopsyMessage = "<strong>Death Roll Capsize (To Windward):</strong> You let the boat roll to windward! This happens downwind if your vang is too loose, or upwind if you catch a massive header and fail to hike or sheet out to balance the boat.";
+        } else if (failureReasonCode === "over_sheeted" || failureReasonCode === "leeward_heel") {
+          autopsyMessage = "<strong>Leeward Capsize (Over-Sheeted):</strong> The wind overpowered your sail! Your mainsheet was sheeted in too tight for this wind speed, or you didn't hike out hard enough to counter the massive heeling force.";
+        } else {
+          autopsyMessage = "<strong>Hull Over-Heeled:</strong> The boat exceeded its maximum stability threshold of 45 degrees and flipped over.";
+        }
 
-        stopSimulation();
+        // 5. Inject and display the Capsize Autopsy Panel overlay directly onto the screen
+        let autopsyDiv = document.getElementById("capsizeAutopsyPanel");
+        if (!autopsyDiv) {
+          autopsyDiv = document.createElement("div");
+          autopsyDiv.id = "capsizeAutopsyPanel";
+          // Inject it straight inside the controls parent container so it sits cleanly alongside your instruments
+          const controlsParent = document.getElementById("controlsDiv") || document.body;
+          controlsParent.appendChild(autopsyDiv);
+        }
 
-        // 👉 Redirect with time and specific capsize reason
-        window.location.href = `finish.html?time=${currentRaceTime}&reason=${failureReason}`;
+        autopsyDiv.style.display = "block";
+        autopsyDiv.style.background = "#fef2f2"; // Alert red tint
+        autopsyDiv.style.border = "2px solid #ef4444";
+        autopsyDiv.style.borderRadius = "8px";
+        autopsyDiv.style.padding = "16px";
+        autopsyDiv.style.marginTop = "8px";
+        autopsyDiv.style.fontFamily = "sans-serif";
+        autopsyDiv.style.boxShadow = "0 4px 6px -1px rgba(0,0,0,0.1)";
+        
+        autopsyDiv.innerHTML = `
+          <div style="color: #991b1b; font-size: 14px; margin-bottom: 8px;">
+            ⚠️ <strong>CAPSIZE ANALYSIS</strong> (Physics Frozen)
+          </div>
+          <p style="margin: 0 0 12px 0; font-size: 12px; color: #7f1d1d; line-height: 1.4;">
+            ${autopsyMessage}
+          </p>
+          <div style="font-size: 11px; color: #475569; margin-bottom: 12px; background: #fff; padding: 6px; border-radius: 4px; border: 1px solid #fee2e2;">
+            ⏳ Survival Time: <strong>${finalTime}s</strong> | Final Heel: <strong>${Math.round(window.globalSimulationData.ILCA.heelAngle || 45)}°</strong>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button onclick="window.location.reload()" style="flex: 1; padding: 8px; font-weight: bold; background: #dc2626; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 11px;">🔄 Try Again</button>
+            <a href="index.html" style="flex: 1; text-align: center; padding: 8px; font-weight: bold; background: white; color: #475569; border: 1px solid #cbd5e1; border-radius: 4px; text-decoration: none; font-size: 11px;">🏡 Main Menu</a>
+          </div>
+        `;
         return;
       }
+
 
       updateILCA(map);
 
