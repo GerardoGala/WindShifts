@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wind Shifts | San Juan Academy</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Examiner</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -28,14 +32,13 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=no">
 </head>
-<body>
   <div style="background-color: var(--nav-bg); color: var(--text-color); padding: 1rem; border-radius: 4px;">
     <h2>San Juan Academy</h2>
   </div>
 
-  <div class="container">
+  <section>
 
-    <div id="map"                style="flex: 15;">
+    <div id="map" >
     </div>
 
     <!-- Live Value Telemetry Grid Block -->
@@ -44,28 +47,6 @@
         <span>Boom Angle:</span>
         <span><span id="boomAngleDisplay">15.0</span>°</span>
       </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>Sailor Position:</span>
-        <span id="sailorPositionDisplay">Hike Hard</span>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>Daggerboard:</span>
-        <span id="daggerboardDisplay">Down</span>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>Vang (Kicker):</span>
-        <span id="vangDisplay">Max</span>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>Downhaul:</span>
-        <span id="downhaulDisplay">Max Luff</span>
-      </div>
-      <div style="display: flex; justify-content: space-between;">
-        <span>Outhaul:</span>
-        <span id="outhaulDisplay">Base</span>
-      </div>
-    </div>
-
 <div id="controlsDiv" style="flex: 3; display: flex; flex-direction: column; gap: 8px;">
   
   <!-- Sheet controls row -->
@@ -85,7 +66,7 @@
     <button class="control-button" onclick="window.globalSimulationData.ILCA.maneuver = 'tack'" style="flex: 1; height: 100%;">TACK</button>
   </div>
 
-</div>
+  </section>
 
 
 
@@ -96,8 +77,35 @@
       <button id="startExamBtn">Start</button>
   </div>
 
-
-
+  <div style="
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%); /* Centered vertically and horizontally */
+      pointer-events: none;
+      font-family: system-ui, -apple-system, sans-serif;
+      min-width: 250px;
+      text-align: center; /* 🎯 FIX: Centers the text inside the 250px box */
+  ">
+      <h2 style="
+          margin: 0;
+          padding: 0;
+          font-size: 1.3rem;
+          font-weight: 700;
+          color: #0d6efd;
+      ">Stage 1 — Learn</h2>
+  </div>
+  <footer class="border-top mt-5 py-1">
+      <div class="container text-center">
+          <p class="mb-1">
+              <strong>Dinghy Sailing Tutorial</strong>
+          </p>
+          <small class="text-body-secondary">
+              Learn • Practice • Challenge
+          </small>
+      </div>
+  </footer>
+  <script src="js/learn.js"></script>
   <script>
     // Map start simulation button logic
     const startExamBtn = document.getElementById('startExamBtn');
@@ -168,5 +176,5 @@ function handleSheetOut() {
 
 </script>
 
-</body>
+
 </html>

@@ -2,9 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Wind Shifts | San Juan Academy</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
+  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Examiner</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -28,14 +31,11 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=.5, user-scalable=no">
 </head>
-<body>
   <div style="background-color: var(--nav-bg); color: var(--text-color); padding: 1rem; border-radius: 4px;">
     <h2>San Juan Academy</h2>
   </div>
-
-  <div class="container">
-
-    <div id="map"                style="flex: 15;">
+  <section>
+    <div id="map" >
     </div>
 
     <!-- Live Value Telemetry Grid Block -->
@@ -86,17 +86,42 @@
   </div>
 
 </div>
+  </section>
 
-
-
+  <div style="
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centered vertically and horizontally */
+    pointer-events: none;
+    font-family: system-ui, -apple-system, sans-serif;
+    min-width: 250px;
+    text-align: center; /* 🎯 FIX: Centers the text inside the 250px box */
+">
+    <h2 style="
+        margin: 0;
+        padding: 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #a55d00;
+    ">Stage 3 — Challenge</h2>
   </div>
 
   
   <div class="control-row" style="position: fixed; top: 50%; left: 50%; transform: translateX(-50%); z-index: 9999;">
       <button id="startExamBtn">Start</button>
   </div>
-
-
+  <footer class="border-top mt-5 py-1">
+      <div class="container text-center">
+          <p class="mb-1">
+              <strong>Dinghy Sailing Tutorial</strong>
+          </p>
+          <small class="text-body-secondary">
+              Learn • Practice • Challenge
+          </small>
+      </div>
+  </footer>
+  <script src="js/challenge.js"></script>
 
   <script>
     // Map start simulation button logic
