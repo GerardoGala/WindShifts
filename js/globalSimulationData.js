@@ -8,8 +8,8 @@ window.globalSimulationData = {
 leewardMarkLat: 13.670464,
 leewardMarkLon: 121.401286,
 
-// 🏁 LEG 1 TARGET: Exactly 500 meters due North of Leeward (Doubled Course)
-windwardMarkLat: 13.674956,
+// 🏁 LEG 1 TARGET: Exactly 300 meters due North of Leeward
+windwardMarkLat: 13.673159,
 windwardMarkLon: 121.401286,
   
 
