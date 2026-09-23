@@ -6,33 +6,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Wind Shifts | San Juan Academy</title>
 
-<!-- Bootstrap -->
+  <!-- 1. External Framework First (Loaded from fast global CDN servers) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
 
-<!-- Bootstrap Icons -->
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+ 
 
-<!-- Google Font -->
+<!-- Shared CSS -->
+<link rel="stylesheet" href="https://gerardogala.github.io/Tutorial-Shared/shared.css">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-<!-- Custom CSS -->
-
-<link rel="stylesheet" href="css/style.css">
-
-<link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-<link rel="manifest" href="favicon/site.webmanifest">
+    	<!-- 2. Your Personal Custom CSS Last (Overrides everything above safely) -->
+  	<link rel="stylesheet" href="css/style.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+    <link rel="manifest" href="favicon/site.webmanifest">
 </head>
 
 <body>
+  <!-- Header will be injected here -->
+  <div id="header-placeholder"></div>
 
-<div style="background-color: var(--nav-bg); color: var(--text-color); padding: 1rem;">
-    <h2>SJ Academy - Wind Shifts</h2>
-</div>
 
 <!-- Hero -->
 <header class="container text-center py-1">
@@ -392,26 +388,14 @@
 
 </section>
 
-<!-- Footer -->
+  <!-- Footer -->
+  <div id="footer-placeholder"></div>
 
-<footer class="border-top mt-5 py-1">
 
-<div class="container text-center">
+  <script src="js/layout.js"></script>
 
-    <p class="mb-1">
-        <strong>Dinghy Sailing Tutorial</strong>
-    </p>
-
-    <small class="text-body-secondary">
-        Learn • Practice • Challenge
-    </small>
-
-</div>
-
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js">
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js">
+  </script>
 
 </body>
 </html>
